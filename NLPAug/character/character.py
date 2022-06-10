@@ -1,5 +1,9 @@
+import json
+import os
 import random
 import string
+
+from pathlib import Path
 from typing import List
 
 KEYBOARD_REPLACEMENTS = {
@@ -34,7 +38,10 @@ KEYBOARD_REPLACEMENTS = {
 
 class Character:
     def __init__(self):
-        pass
+        working_directory = Path(os.getcwd())
+        path = working_directory / "data" / "missp_data.json"
+        with path.open() as f:
+            self.missp = json.load(f)
 
     def noise_induction(self, text):
         # Won't do this now.
@@ -121,6 +128,19 @@ class Character:
                 new_words.append(''.join(new_word))
         return new_words
 
+    def misspeller(self, text: List[str]) -> List[str]:
+        new_words = []
+        for word in text:
+            if word in self.missp:
+                new_words.append(random.choice(self.missp[word]))
+            else:
+                new_words.append(word)
+        return new_words
 
-for word in Character.inserter('Hello world good morning fine worlds and you and me all is super goood'):
+
+augmenter = Character()
+
+for word in augmenter.misspeller(
+        ['Hello', 'world', 'good', 'morning', 'fine', 'worlds', 'and', 'you', 'and', 'me', 'all', 'is', 'super',
+         'goood']):
     print(word)
