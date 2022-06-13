@@ -1,8 +1,10 @@
+import argparse
 import json
 import os
 import random
 import string
 
+from nltk.tokenize import wordpunct_tokenize
 from pathlib import Path
 from typing import List
 
@@ -100,7 +102,7 @@ class Character:
     def keyboard_replacer(text: List[str]) -> List[str]:
         new_words = []
         for word in text:
-            # Interesting behavior, 1 letter words are always changed.
+            # Interesting behavior, 1-letter words are always changed.
             # if len(word) > 1:
             new_word = list(word)
             rand_index = random.randint(0, len(word) - 1)
@@ -140,7 +142,27 @@ class Character:
 
 augmenter = Character()
 
-for word in augmenter.misspeller(
-        ['Hello', 'world', 'good', 'morning', 'fine', 'worlds', 'and', 'you', 'and', 'me', 'all', 'is', 'super',
-         'goood']):
-    print(word)
+parser = argparse.ArgumentParser(prog='augmenter', description='Augment data corpora with different possible .')
+parser.add_argument('in_file', type=str, help='The path to the corpus that should be augmented.')
+parser.add_argument('--modes', action='store', default='all',
+                    help='Which augmentation modes should be used. Provide a list of string seperated by a comma.')
+
+in_file = parser.parse_args().in_file
+modes = parser.parse_args().modes
+
+# print(getattr(augmenter, 'nonsense')(['asd']))
+
+if modes == 'all':
+    mode_list = [method for method in dir(Character) if method.startswith('__') is False]
+else:
+    modes ==  modes.split(',')
+
+with open(in_file, 'r') as f:
+    for line in f:
+        tokenized_line = wordpunct_tokenize(line)
+        for token in tokenized_line:
+            if token.isalpha():
+
+    # for mode in modes:
+    #     getattr(augmenter, mode)()
+
