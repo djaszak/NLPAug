@@ -213,8 +213,5 @@ for mode in modes:
                         new_line.append(token)
                 new_document.append(d.detokenize(new_line) + '\n')
         
-    with open(f'augmented_output_{mode}', 'w') as f:
-        # "%s\n" % l for l in lines
+    with open(f'augmented_output_{mode}.dat', 'w') as f:
         f.writelines(new_document)
-
-# print(new_document)
