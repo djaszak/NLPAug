@@ -5,8 +5,10 @@ import random
 import string
 
 from nltk.tokenize import wordpunct_tokenize
+from nltk.tokenize import TreebankWordTokenizer, TreebankWordDetokenizer
 from pathlib import Path
 from typing import List
+from tqdm import tqdm
 
 KEYBOARD_REPLACEMENTS = {
     'q': ['w', 's', 'a'],
@@ -37,6 +39,46 @@ KEYBOARD_REPLACEMENTS = {
     'm': ['h', 'n', 'k', 'j'],
 }
 
+
+KEYBOARD_REPLACEMENTS_CS = {
+    'q': ['+', 'ě', 'w', 's' ,'a'],
+    'w': ['q', 'a', 's', 'd', 'e', 'š' ,'ě'],
+    'e': ['w', 's', 'd', 'r', 'č' ,'š'],
+    'r': ['e', 'd', 'f', 't', 'ř' ,'č'],
+    't': ['r', 'f', 'g', 'z', 'ž' ,'ř'],
+    'z': ['t', 'g', 'h', 'u', 'ý' ,'ž'],
+    'u': ['z', 'h', 'j', 'i', 'á' ,'ý'],
+    'i': ['u', 'j', 'k', 'o', 'í' ,'á'],
+    'o': ['i', 'k', 'l', 'p', 'é' ,'í'],
+    'p': ['o', 'l', 'ů', 'ú', '=' ,'é'],
+    'ú': ['=', 'p', 'ů', '§', ')' ,'\''],
+    'a': ['q', 'w', 's', 'x' ,'y'],
+    's': ['a', 'w', 'e', 'd', 'x' ,'y'],
+    'd': ['s', 'e', 'r', 'f', 'c' ,'x'],
+    'f': ['d', 'r', 't', 'g', 'v' ,'c'],
+    'g': ['f', 't', 'z', 'h', 'b' ,'v'],
+    'h': ['g', 'z', 'u', 'j', 'n' ,'b'],
+    'j': ['u', 'i', 'k', 'm', 'n' ,'h'],
+    'k': ['j', 'i', 'o', 'l', ',' ,'m'],
+    'l': ['k', 'o', 'p', 'ů', '.' ,','],
+    'ů': ['l', 'p', 'ú', '§', '-' ,'.'],
+    'y': [',', 'a', 's' ,'x'],
+    'x': [',', 'y', 's', 'd' ,'c'],
+    'c': [',', 'x', 'd', 'f' ,'v'],
+    'v': [',', 'c', 'f', 'g' ,'b'],
+    'b': [',', 'v', 'g', 'h' ,'n'],
+    'n': [',', 'b', 'h', 'j' ,'m'],
+    'm': [',', 'n', 'j', 'k' ,','],
+    'ě': [',', '+', 'q', 'w' ,'š'],
+    'š': [',', 'ě', 'w', 'e' ,'č'],
+    'č': [',', 'š', 'e', 'r' ,'ř'],
+    'ř': [',', 'č', 'r', 't' ,'ž'],
+    'ž': [',', 'ř', 't', 'z' ,'ý'],
+    'ý': [',', 'ž', 'z', 'u' ,'á'],
+    'á': [',', 'ý', 'u', 'i' ,'í'],
+    'í': [',', 'á', 'i', 'o' ,'é'],
+    'é': [',', 'í', 'o', 'p' ,'='],
+}
 
 class Character:
     def __init__(self):
@@ -106,7 +148,7 @@ class Character:
             # if len(word) > 1:
             new_word = list(word)
             rand_index = random.randint(0, len(word) - 1)
-            new_word[rand_index] = random.choice(KEYBOARD_REPLACEMENTS[word[rand_index]])
+            new_word[rand_index] = random.choice(KEYBOARD_REPLACEMENTS.get(word[rand_index].lower(), 'a'))
             new_words.append(''.join(new_word))
         return new_words
 
@@ -144,25 +186,35 @@ augmenter = Character()
 
 parser = argparse.ArgumentParser(prog='augmenter', description='Augment data corpora with different possible .')
 parser.add_argument('in_file', type=str, help='The path to the corpus that should be augmented.')
-parser.add_argument('--modes', action='store', default='all',
-                    help='Which augmentation modes should be used. Provide a list of string seperated by a comma.')
+parser.add_argument('--modes', action='store', default='all', nargs='+',
+                    help='Which augmentation modes should be used. Provide a list of strings seperated by a comma.')
 
 in_file = parser.parse_args().in_file
 modes = parser.parse_args().modes
 
-# print(getattr(augmenter, 'nonsense')(['asd']))
+if 'all' in modes:
+    modes = [method for method in dir(Character) if method.startswith('__') is False]
 
-if modes == 'all':
-    mode_list = [method for method in dir(Character) if method.startswith('__') is False]
-else:
-    modes ==  modes.split(',')
 
-with open(in_file, 'r') as f:
-    for line in f:
-        tokenized_line = wordpunct_tokenize(line)
-        for token in tokenized_line:
-            if token.isalpha():
+new_document = []
+t = TreebankWordTokenizer()
+d = TreebankWordDetokenizer()
 
-    # for mode in modes:
-    #     getattr(augmenter, mode)()
+for mode in modes:
+    with open(in_file, 'r') as f:
+        for line in tqdm(f):
+            if not line.startswith('<'):
+                new_line = []
+                for token in t.tokenize(line):
+                    if token.isalpha():
+                        augmented_token = getattr(augmenter, mode)([token])[0]
+                        new_line.append(augmented_token)
+                    else:
+                        new_line.append(token)
+                new_document.append(d.detokenize(new_line) + '\n')
+        
+    with open(f'augmented_output_{mode}', 'w') as f:
+        # "%s\n" % l for l in lines
+        f.writelines(new_document)
 
+# print(new_document)
