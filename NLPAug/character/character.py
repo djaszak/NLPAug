@@ -1,10 +1,9 @@
-import argparse
 import json
 import os
 import random
 import string
 
-from nltk.tokenize import wordpunct_tokenize
+from datasets import concatenate_datasets, load_dataset
 from nltk.tokenize import TreebankWordTokenizer, TreebankWordDetokenizer
 from pathlib import Path
 from typing import List
@@ -39,46 +38,6 @@ KEYBOARD_REPLACEMENTS = {
     'm': ['h', 'n', 'k', 'j'],
 }
 
-
-KEYBOARD_REPLACEMENTS_CS = {
-    'q': ['+', 'ě', 'w', 's' ,'a'],
-    'w': ['q', 'a', 's', 'd', 'e', 'š' ,'ě'],
-    'e': ['w', 's', 'd', 'r', 'č' ,'š'],
-    'r': ['e', 'd', 'f', 't', 'ř' ,'č'],
-    't': ['r', 'f', 'g', 'z', 'ž' ,'ř'],
-    'z': ['t', 'g', 'h', 'u', 'ý' ,'ž'],
-    'u': ['z', 'h', 'j', 'i', 'á' ,'ý'],
-    'i': ['u', 'j', 'k', 'o', 'í' ,'á'],
-    'o': ['i', 'k', 'l', 'p', 'é' ,'í'],
-    'p': ['o', 'l', 'ů', 'ú', '=' ,'é'],
-    'ú': ['=', 'p', 'ů', '§', ')' ,'\''],
-    'a': ['q', 'w', 's', 'x' ,'y'],
-    's': ['a', 'w', 'e', 'd', 'x' ,'y'],
-    'd': ['s', 'e', 'r', 'f', 'c' ,'x'],
-    'f': ['d', 'r', 't', 'g', 'v' ,'c'],
-    'g': ['f', 't', 'z', 'h', 'b' ,'v'],
-    'h': ['g', 'z', 'u', 'j', 'n' ,'b'],
-    'j': ['u', 'i', 'k', 'm', 'n' ,'h'],
-    'k': ['j', 'i', 'o', 'l', ',' ,'m'],
-    'l': ['k', 'o', 'p', 'ů', '.' ,','],
-    'ů': ['l', 'p', 'ú', '§', '-' ,'.'],
-    'y': [',', 'a', 's' ,'x'],
-    'x': [',', 'y', 's', 'd' ,'c'],
-    'c': [',', 'x', 'd', 'f' ,'v'],
-    'v': [',', 'c', 'f', 'g' ,'b'],
-    'b': [',', 'v', 'g', 'h' ,'n'],
-    'n': [',', 'b', 'h', 'j' ,'m'],
-    'm': [',', 'n', 'j', 'k' ,','],
-    'ě': [',', '+', 'q', 'w' ,'š'],
-    'š': [',', 'ě', 'w', 'e' ,'č'],
-    'č': [',', 'š', 'e', 'r' ,'ř'],
-    'ř': [',', 'č', 'r', 't' ,'ž'],
-    'ž': [',', 'ř', 't', 'z' ,'ý'],
-    'ý': [',', 'ž', 'z', 'u' ,'á'],
-    'á': [',', 'ý', 'u', 'i' ,'í'],
-    'í': [',', 'á', 'i', 'o' ,'é'],
-    'é': [',', 'í', 'o', 'p' ,'='],
-}
 
 class Character:
     def __init__(self):
@@ -148,7 +107,10 @@ class Character:
             # if len(word) > 1:
             new_word = list(word)
             rand_index = random.randint(0, len(word) - 1)
-            new_word[rand_index] = random.choice(KEYBOARD_REPLACEMENTS.get(word[rand_index].lower(), 'a'))
+            try:
+                new_word[rand_index] = random.choice(KEYBOARD_REPLACEMENTS[word[rand_index].lower()])
+            except KeyError:
+                pass
             new_words.append(''.join(new_word))
         return new_words
 
@@ -160,6 +122,8 @@ class Character:
                 new_word = list(word)
                 new_word.pop(random.randint(0, len(word) - 1))
                 new_words.append(''.join(new_word))
+            else:
+                new_words.append(word)
         return new_words
 
     @staticmethod
@@ -182,36 +146,151 @@ class Character:
         return new_words
 
 
-augmenter = Character()
+# -- File augmenter CLI -- #
+# augmenter = Character()
+#
+# parser = argparse.ArgumentParser(prog='augmenter', description='Augment data corpora with different possible .')
+# parser.add_argument('in_file', type=str, help='The path to the corpus that should be augmented.')
+# parser.add_argument('--modes', action='store', default='all', nargs='+',
+#                     help='Which augmentation modes should be used. Provide a list of strings seperated by a comma.')
+#
+# in_file = parser.parse_args().in_file
+# modes = parser.parse_args().modes
+#
+# if 'all' in modes:
+#     modes = [method for method in dir(Character) if method.startswith('__') is False]
+#
+# new_document = []
+# t = TreebankWordTokenizer()
+# d = TreebankWordDetokenizer()
+#
+# for mode in modes:
+#     with open(in_file, 'r') as f:
+#         for line in tqdm(f):
+#             if not line.startswith('<'):
+#                 new_line = []
+#                 for token in t.tokenize(line):
+#                     if token.isalpha():
+#                         augmented_token = getattr(augmenter, mode)([token])[0]
+#                         new_line.append(augmented_token)
+#                     else:
+#                         new_line.append(token)
+#                 new_document.append(d.detokenize(new_line) + '\n')
+#
+#     with open(f'augmented_output_{mode}.dat', 'w') as f:
+#         f.writelines(new_document)
 
-parser = argparse.ArgumentParser(prog='augmenter', description='Augment data corpora with different possible .')
-parser.add_argument('in_file', type=str, help='The path to the corpus that should be augmented.')
-parser.add_argument('--modes', action='store', default='all', nargs='+',
-                    help='Which augmentation modes should be used. Provide a list of strings seperated by a comma.')
+# -- Testing augmentation of IMDB -- #
 
-in_file = parser.parse_args().in_file
-modes = parser.parse_args().modes
+# TODO: Add datatype
+def augment_data(data, method: str):
+    """
 
-if 'all' in modes:
-    modes = [method for method in dir(Character) if method.startswith('__') is False]
+    Args:
+        method: The augmentation method that should be used.
+        data: Data from a specific dataset
+
+    Returns:
+        Augmented data.
+    """
+    t = TreebankWordTokenizer()
+    d = TreebankWordDetokenizer()
+    augmenter = Character()
+
+    new_line = []
+    # print(data)
+    try:
+        for token in t.tokenize(data):
+            if token.isalpha():
+                augmented_token = getattr(augmenter, method)([token])[0]
+                new_line.append(augmented_token)
+            else:
+                new_line.append(token)
+    except TypeError:
+        print(type(data))
+    data = d.detokenize(new_line)
+
+    return data
 
 
-new_document = []
-t = TreebankWordTokenizer()
-d = TreebankWordDetokenizer()
+def misspell_data(data):
+    data['text'] = augment_data(data['text'], 'misspeller')
+    return data
 
-for mode in modes:
-    with open(in_file, 'r') as f:
-        for line in tqdm(f):
-            if not line.startswith('<'):
-                new_line = []
-                for token in t.tokenize(line):
-                    if token.isalpha():
-                        augmented_token = getattr(augmenter, mode)([token])[0]
-                        new_line.append(augmented_token)
-                    else:
-                        new_line.append(token)
-                new_document.append(d.detokenize(new_line) + '\n')
-        
-    with open(f'augmented_output_{mode}.dat', 'w') as f:
-        f.writelines(new_document)
+
+def random_switcher_data(data):
+    data['text'] = augment_data(data['text'], 'random_switcher')
+    return data
+
+
+def mid_randomizer_data(data):
+    data['text'] = augment_data(data['text'], 'mid_randomizer')
+    return data
+
+
+def complete_randomizer_data(data):
+    data['text'] = augment_data(data['text'], 'complete_randomizer')
+    return data
+
+
+def keyboard_replacer_data(data):
+    data['text'] = augment_data(data['text'], 'keyboard_replacer')
+    return data
+
+
+def remover_data(data):
+    data['text'] = augment_data(data['text'], 'remover')
+    return data
+
+
+def inserter_data(data):
+    data['text'] = augment_data(data['text'], 'inserter')
+    return data
+
+
+TRAIN = 'train'
+TEST = 'test'
+UNNAMED = 'Unnamed: 0'
+# An example I wanna use
+
+imdb_train = load_dataset("imdb", split='train')
+imdb_test = load_dataset("imdb", split='test')
+#
+# imdb_train.map(misspell_data, num_proc=6).to_csv(
+#     '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/misspelled_imdb_train.csv')
+# imdb_test.map(misspell_data, num_proc=6).to_csv(
+#     '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/misspelled_imdb_test.csv')
+#
+# imdb_train.map(random_switcher_data, num_proc=6).to_csv(
+#     '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/random_switcher_imdb_train.csv')
+# imdb_test.map(random_switcher_data, num_proc=6).to_csv(
+#     '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/random_switcher_imdb_test.csv')
+#
+# imdb_train.map(mid_randomizer_data, num_proc=6).to_csv(
+#     '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/mid_randomizer_imdb_train.csv')
+# imdb_test.map(mid_randomizer_data, num_proc=6).to_csv(
+#     '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/mid_randomizer_imdb_test.csv')
+#
+# imdb_train.map(complete_randomizer_data, num_proc=6).to_csv(
+#     '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/complete_randomizer_imdb_train.csv')
+# imdb_test.map(complete_randomizer_data, num_proc=6).to_csv(
+#     '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/complete_randomizer_imdb_test.csv')
+#
+# imdb_train.map(keyboard_replacer_data, num_proc=6).to_csv(
+#     '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/keyboard_replacer_imdb_train.csv')
+# imdb_test.map(keyboard_replacer_data, num_proc=6).to_csv(
+#     '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/keyboard_replacer_imdb_test.csv')
+
+imdb_train.map(remover_data, num_proc=6).to_csv(
+    '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/remover_imdb_train.csv')
+imdb_test.map(remover_data, num_proc=6).to_csv(
+    '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/remover_imdb_test.csv')
+
+imdb_train.map(inserter_data, num_proc=6).to_csv(
+    '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/inserter_imdb_train.csv')
+imdb_test.map(inserter_data, num_proc=6).to_csv(
+    '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/inserter_imdb_test.csv')
+# print(misspelled_dataset[TEST])
+
+# dataset = load_dataset('csv', data_files={'train': '/home/dennis/Uni/GrosserBeleg/augmented_imdb_datasets/misspelled_imdb_train.csv'})
+# print(dataset.remove_columns(UNNAMED))
