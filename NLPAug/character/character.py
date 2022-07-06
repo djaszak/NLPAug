@@ -3,11 +3,9 @@ import os
 import random
 import string
 
-from datasets import concatenate_datasets, load_dataset
+from datasets import load_dataset
 from nltk.tokenize import TreebankWordTokenizer, TreebankWordDetokenizer
 from pathlib import Path
-from typing import List
-from tqdm import tqdm
 
 KEYBOARD_REPLACEMENTS = {
     "q": ["w", "s", "a"],
@@ -51,7 +49,7 @@ class Character:
         pass
 
     @staticmethod
-    def random_switcher(text: List[str]) -> List[str]:
+    def random_switcher(text: str) -> str:
         """
         Randomly switches two letters in word.
         Args:
@@ -76,7 +74,7 @@ class Character:
         return new_words
 
     @staticmethod
-    def mid_randomizer(text: List[str]) -> List[str]:
+    def mid_randomizer(text: str) -> str:
         new_words = []
         for word in text:
             if len(word) > 3:
@@ -89,7 +87,7 @@ class Character:
         return new_words
 
     @staticmethod
-    def complete_randomizer(text: List[str]) -> List[str]:
+    def complete_randomizer(text: str) -> str:
         new_words = []
         for word in text:
             if len(word) > 1:
@@ -100,7 +98,7 @@ class Character:
         return new_words
 
     @staticmethod
-    def keyboard_replacer(text: List[str]) -> List[str]:
+    def keyboard_replacer(text: str) -> str:
         new_words = []
         for word in text:
             # Interesting behavior, 1-letter words are always changed.
@@ -117,7 +115,7 @@ class Character:
         return new_words
 
     @staticmethod
-    def remover(text: List[str]) -> List[str]:
+    def remover(text: str) -> str:
         new_words = []
         for word in text:
             if len(word) > 1:
@@ -129,7 +127,7 @@ class Character:
         return new_words
 
     @staticmethod
-    def inserter(text: List[str]) -> List[str]:
+    def inserter(text: str) -> str:
         new_words = []
         for word in text:
             if len(word) > 1:
@@ -141,7 +139,7 @@ class Character:
                 new_words.append("".join(new_word))
         return new_words
 
-    def misspeller(self, text: List[str]) -> List[str]:
+    def misspeller(self, text: str) -> str:
         new_words = []
         for word in text:
             if word in self.missp:
@@ -150,42 +148,6 @@ class Character:
                 new_words.append(word)
         return new_words
 
-
-# -- File augmenter CLI -- #
-# augmenter = Character()
-#
-# parser = argparse.ArgumentParser(prog='augmenter', description='Augment data corpora with different possible .')
-# parser.add_argument('in_file', type=str, help='The path to the corpus that should be augmented.')
-# parser.add_argument('--modes', action='store', default='all', nargs='+',
-#                     help='Which augmentation modes should be used. Provide a list of strings seperated by a comma.')
-#
-# in_file = parser.parse_args().in_file
-# modes = parser.parse_args().modes
-#
-# if 'all' in modes:
-#     modes = [method for method in dir(Character) if method.startswith('__') is False]
-#
-# new_document = []
-# t = TreebankWordTokenizer()
-# d = TreebankWordDetokenizer()
-#
-# for mode in modes:
-#     with open(in_file, 'r') as f:
-#         for line in tqdm(f):
-#             if not line.startswith('<'):
-#                 new_line = []
-#                 for token in t.tokenize(line):
-#                     if token.isalpha():
-#                         augmented_token = getattr(augmenter, mode)([token])[0]
-#                         new_line.append(augmented_token)
-#                     else:
-#                         new_line.append(token)
-#                 new_document.append(d.detokenize(new_line) + '\n')
-#
-#     with open(f'augmented_output_{mode}.dat', 'w') as f:
-#         f.writelines(new_document)
-
-# -- Testing augmentation of IMDB -- #
 
 # TODO: Add datatype
 def augment_data(data, method: str):
@@ -207,7 +169,7 @@ def augment_data(data, method: str):
     try:
         for token in t.tokenize(data):
             if token.isalpha():
-                augmented_token = getattr(augmenter, method)([token])[0]
+                augmented_token = getattr(augmenter, method)(token)
                 new_line.append(augmented_token)
             else:
                 new_line.append(token)
