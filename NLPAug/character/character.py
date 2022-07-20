@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import json
 import os
 import random
@@ -40,7 +41,10 @@ KEYBOARD_REPLACEMENTS = {
 class Character:
     def __init__(self):
         working_directory = Path(os.getcwd())
-        path = working_directory / "data" / "missp_data.json"
+        # path = working_directory / "data" / "missp_data.json"
+        path = Path(
+            "/home/dennis/Uni/GrosserBeleg/NLPAug/NLPAug/character/data/missp_data.json"
+        )
         with path.open() as f:
             self.missp = json.load(f)
 
@@ -49,7 +53,7 @@ class Character:
         pass
 
     @staticmethod
-    def random_switcher(text: str) -> str:
+    def random_switcher(text: list) -> list:
         """
         Randomly switches two letters in word.
         Args:
@@ -74,7 +78,7 @@ class Character:
         return new_words
 
     @staticmethod
-    def mid_randomizer(text: str) -> str:
+    def mid_randomizer(text: list) -> list:
         new_words = []
         for word in text:
             if len(word) > 3:
@@ -87,7 +91,7 @@ class Character:
         return new_words
 
     @staticmethod
-    def complete_randomizer(text: str) -> str:
+    def complete_randomizer(text: list) -> list:
         new_words = []
         for word in text:
             if len(word) > 1:
@@ -98,7 +102,7 @@ class Character:
         return new_words
 
     @staticmethod
-    def keyboard_replacer(text: str) -> str:
+    def keyboard_replacer(text: list) -> list:
         new_words = []
         for word in text:
             # Interesting behavior, 1-letter words are always changed.
@@ -115,7 +119,7 @@ class Character:
         return new_words
 
     @staticmethod
-    def remover(text: str) -> str:
+    def remover(text: list) -> list:
         new_words = []
         for word in text:
             if len(word) > 1:
@@ -127,7 +131,7 @@ class Character:
         return new_words
 
     @staticmethod
-    def inserter(text: str) -> str:
+    def inserter(text: list) -> list:
         new_words = []
         for word in text:
             if len(word) > 1:
@@ -139,7 +143,7 @@ class Character:
                 new_words.append("".join(new_word))
         return new_words
 
-    def misspeller(self, text: str) -> str:
+    def misspeller(self, text: list) -> list:
         new_words = []
         for word in text:
             if word in self.missp:
@@ -165,12 +169,11 @@ def augment_data(data, method: str):
     augmenter = Character()
 
     new_line = []
-    # print(data)
     try:
         for token in t.tokenize(data):
             if token.isalpha():
-                augmented_token = getattr(augmenter, method)(token)
-                new_line.append(augmented_token)
+                augmented_token = getattr(augmenter, method)([token])
+                new_line.append(augmented_token[0])
             else:
                 new_line.append(token)
     except TypeError:

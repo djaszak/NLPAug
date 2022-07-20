@@ -1,4 +1,6 @@
+import pickle
 from datasets import load_dataset, load_metric, concatenate_datasets, ClassLabel
+from datasets.fingerprint import Hasher
 import numpy as np
 from transformers import (
     AutoTokenizer,
@@ -23,13 +25,13 @@ TEST = "test"
 # Variable assignments
 tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
 training_args = TrainingArguments(
-    # TODO: less epochs
-    output_dir="test_trainer", evaluation_strategy="epoch", num_train_epochs=10
+    output_dir="test_trainer", evaluation_strategy="epoch"
 )
 model = AutoModelForSequenceClassification.from_pretrained(
     "bert-base-cased", num_labels=2
 )
 metric = load_metric("accuracy")
+hasher = Hasher()
 
 
 def tokenize_function(examples):
@@ -42,296 +44,87 @@ def compute_metrics(eval_pred):
     return metric.compute(predictions=predictions, references=labels)
 
 
-dataset = load_dataset("imdb")
-dataset.pop("unsupervised")
-cr_dataset = dataset.map(complete_randomizer_data, num_proc=multiprocessing.cpu_count())
+def train(training_set, eval_set):
+    trainer_kwargs = {
+        "model": model,
+        "args": training_args,
+        "train_dataset": training_set,
+        "eval_dataset": eval_set,
+        "compute_metrics": compute_metrics,
+    }
+    
+    return Trainer(**trainer_kwargs).train()
 
-complete_randomizer_imdb_dataset = (
-    load_dataset(
-        "csv",
-        data_files={
-            "train": "/home/djaszak/augmented_imdb_datasets/complete_randomizer_imdb_train.csv",
-            "test": "/home/djaszak/augmented_imdb_datasets/complete_randomizer_imdb_test.csv",
-        },
-    )
-    .remove_columns("Unnamed: 0")
-    .cast_column("label", ClassLabel(num_classes=2, names=["neg", "pos"], id=None))
+
+# def save_results(trainer, name):
+#     results = trainer.train()
+#     metrics = results.metrics
+#     trainer.save_metrics(f"{name}_test", metrics)
+
+imdb_dataset = load_dataset("imdb")
+imdb_dataset.pop("unsupervised")
+imdb_dataset = imdb_dataset.map(
+    tokenize_function, batched=True, num_proc=multiprocessing.cpu_count()
 )
-keyboard_replacer_imdb_dataset = (
-    load_dataset(
-        "csv",
-        data_files={
-            "train": "/home/djaszak/augmented_imdb_datasets/keyboard_replacer_imdb_train.csv",
-            "test": "/home/djaszak/augmented_imdb_datasets/keyboard_replacer_imdb_test.csv",
-        },
-    )
-    .remove_columns("Unnamed: 0")
-    .cast_column("label", ClassLabel(num_classes=2, names=["neg", "pos"], id=None))
+imdb_train = imdb_dataset[TRAIN]
+imdb_eval = imdb_dataset[TEST]
+
+# Augmented test data
+cr_train = imdb_train.select(range(100)).map(
+    complete_randomizer_data, num_proc=multiprocessing.cpu_count()
 )
-mid_randomizer_imdb_dataset = (
-    load_dataset(
-        "csv",
-        data_files={
-            "train": "/home/djaszak/augmented_imdb_datasets/mid_randomizer_imdb_train.csv",
-            "test": "/home/djaszak/augmented_imdb_datasets/mid_randomizer_imdb_test.csv",
-        },
-    )
-    .remove_columns("Unnamed: 0")
-    .cast_column("label", ClassLabel(num_classes=2, names=["neg", "pos"], id=None))
-)
-random_switcher_imdb_dataset = (
-    load_dataset(
-        "csv",
-        data_files={
-            "train": "/home/djaszak/augmented_imdb_datasets/random_switcher_imdb_train.csv",
-            "test": "/home/djaszak/augmented_imdb_datasets/random_switcher_imdb_test.csv",
-        },
-    )
-    .remove_columns("Unnamed: 0")
-    .cast_column("label", ClassLabel(num_classes=2, names=["neg", "pos"], id=None))
-)
-remover_imdb_dataset = (
-    load_dataset(
-        "csv",
-        data_files={
-            "train": "/home/djaszak/augmented_imdb_datasets/remover_imdb_train.csv",
-            "test": "/home/djaszak/augmented_imdb_datasets/remover_imdb_test.csv",
-        },
-    )
-    .remove_columns("Unnamed: 0")
-    .cast_column("label", ClassLabel(num_classes=2, names=["neg", "pos"], id=None))
-)
-misspelled_imdb_dataset = (
-    load_dataset(
-        "csv",
-        data_files={
-            "train": "/home/djaszak/augmented_imdb_datasets/misspelled_imdb_train.csv",
-            "test": "/home/djaszak/augmented_imdb_datasets/misspelled_imdb_test.csv",
-        },
-    )
-    .remove_columns("Unnamed: 0")
-    .cast_column("label", ClassLabel(num_classes=2, names=["neg", "pos"], id=None))
-)
+# kr_train = imdb_train.map(keyboard_replacer_data, num_proc=multiprocessing.cpu_count())
+# mr_train = imdb_train.map(mid_randomizer_data, num_proc=multiprocessing.cpu_count())
+# rs_train = imdb_train.map(random_switcher_data, num_proc=multiprocessing.cpu_count())
+# inserter_train = imdb_train.map(inserter_data, num_proc=multiprocessing.cpu_count())
+# remover_train = imdb_train.map(remover_data, num_proc=multiprocessing.cpu_count())
+# misspell_train = imdb_train.map(misspell_data, num_proc=multiprocessing.cpu_count())
 
+# # Extend imdb_train by augmented data
+# cr_imdb_train = concatenate_datasets([imdb_train, cr_train])
+# kr_imdb_train = concatenate_datasets([imdb_train, kr_train])
+# mr_imdb_train = concatenate_datasets([imdb_train, mr_train])
+# rs_imdb_train = concatenate_datasets([imdb_train, rs_train])
+# inserter_imdb_train = concatenate_datasets([imdb_train, inserter_train])
+# remover_imdb_train = concatenate_datasets([imdb_train, remover_train])
+# misspell_imdb_train = concatenate_datasets([imdb_train, misspell_train])
 
-imdb_tokenized_datasets = dataset.map(tokenize_function, batched=True)
-imdb_train = imdb_tokenized_datasets[TRAIN]
-imdb_eval = imdb_tokenized_datasets[TEST]
+# Baseline training
+imdb_trained = train(imdb_train, imdb_eval)
 
-cr_tokenized_datasets = complete_randomizer_imdb_dataset.map(
-    tokenize_function, batched=True
-)
-cr_train = cr_tokenized_datasets[TRAIN]
-cr_eval = cr_tokenized_datasets[TEST]
-cr_imdb_train = concatenate_datasets([imdb_train, cr_train])
+# Only augmented datasets
+cr_trained = train(imdb_train, imdb_eval)
+kr_trained = train(imdb_train, imdb_eval)
+mr_trained = train(imdb_train, imdb_eval)
+rs_trained = train(imdb_train, imdb_eval)
+inserter_trained = train(imdb_train, imdb_eval)
+remover_trained = train(imdb_train, imdb_eval)
+misspell_trained = train(imdb_train, imdb_eval)
 
-kr_tokenized_datasets = keyboard_replacer_imdb_dataset.map(
-    tokenize_function, batched=True
-)
-kr_train = kr_tokenized_datasets[TRAIN]
-kr_imdb_train = concatenate_datasets([imdb_train, kr_train])
-kr_eval = kr_tokenized_datasets[TEST]
-
-mr_tokenized_datasets = mid_randomizer_imdb_dataset.map(tokenize_function, batched=True)
-mr_train = mr_tokenized_datasets[TRAIN]
-mr_imdb_train = concatenate_datasets([imdb_train, mr_train])
-mr_eval = mr_tokenized_datasets[TEST]
-
-replacer_tokenized_datasets = random_switcher_imdb_dataset.map(
-    tokenize_function, batched=True
-)
-r_train = replacer_tokenized_datasets[TRAIN]
-r_imdb_train = concatenate_datasets([imdb_train, r_train])
-r_eval = replacer_tokenized_datasets[TEST]
-
-remover_tokenized_datasets = remover_imdb_dataset.map(tokenize_function, batched=True)
-remover_train = remover_tokenized_datasets[TRAIN]
-remover_imdb_train = concatenate_datasets([imdb_train, remover_train])
-remover_eval = remover_tokenized_datasets[TEST]
-
-misspelled_tokenized_datasets = misspelled_imdb_dataset.map(
-    tokenize_function, batched=True
-)
-misspelled_train = misspelled_tokenized_datasets[TRAIN]
-misspelled_imdb_train = concatenate_datasets([imdb_train, misspelled_train])
-misspelled_eval = misspelled_tokenized_datasets[TEST]
-
-# Use **kwargs
-imdb_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=imdb_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-cr_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=cr_train,
-    eval_dataset=cr_eval,
-    compute_metrics=compute_metrics,
-)
-
-kr_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=kr_train,
-    eval_dataset=kr_eval,
-    compute_metrics=compute_metrics,
-)
-
-mr_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=mr_train,
-    eval_dataset=mr_eval,
-    compute_metrics=compute_metrics,
-)
-
-r_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=r_train,
-    eval_dataset=r_eval,
-    compute_metrics=compute_metrics,
-)
-
-remover_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=remover_train,
-    eval_dataset=remover_eval,
-    compute_metrics=compute_metrics,
-)
-
-misspelled_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=misspelled_train,
-    eval_dataset=misspelled_eval,
-    compute_metrics=compute_metrics,
-)
-
-cr_imdb_eval_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=cr_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-kr_imdb_eval_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=kr_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-mr_imdb_eval_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=mr_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-r_imdb_eval_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=r_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-remover_imdb_eval_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=remover_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-misspelled_imdb_eval_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=misspelled_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-cr_imdb_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=cr_imdb_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-kr_imdb_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=kr_imdb_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-mr_imdb_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=mr_imdb_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-r_imdb_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=r_imdb_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-remover_imdb_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=remover_imdb_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-misspelled_imdb_trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=misspelled_imdb_train,
-    eval_dataset=imdb_eval,
-    compute_metrics=compute_metrics,
-)
-
-
-def save_results(trainer, name):
-    results = trainer.train()
-    metrics = results.metrics
-    trainer.save_metrics(f"{name}_test", metrics)
-
-
-save_results(imdb_trainer, "imdb")
-save_results(cr_trainer, "cr")
-save_results(kr_trainer, "kr")
-save_results(r_trainer, "r")
-save_results(mr_trainer, "mr")
-save_results(remover_trainer, "remover")
-save_results(misspelled_trainer, "misspelled")
-save_results(cr_imdb_eval_trainer, "cr_imdb_eval")
-save_results(kr_imdb_eval_trainer, "kr_imdb_eval")
-save_results(mr_imdb_eval_trainer, "mr_imdb_eval")
-save_results(r_imdb_eval_trainer, "r_imdb_eval")
-save_results(remover_imdb_eval_trainer, "remover_imdb_eval")
-save_results(misspelled_imdb_eval_trainer, "misspelled_imdb_eval")
-save_results(cr_imdb_trainer, "cr_imdb")
-save_results(kr_imdb_trainer, "kr_imdb")
-save_results(mr_imdb_trainer, "mr_imdb")
-save_results(r_imdb_trainer, "r_imdb")
-save_results(remover_imdb_trainer, "remover_imdb")
-save_results(misspelled_imdb_trainer, "misspelled_imdb")
+# Baseline data extended by augmented data (50k data instead of 25k)
+cr_imdb_trained = train(imdb_train, imdb_eval)
+kr_imdb_trained = train(imdb_train, imdb_eval)
+mr_imdb_trained = train(imdb_train, imdb_eval)
+rs_imdb_trained = train(imdb_train, imdb_eval)
+inserter_imdb_trained = train(imdb_train, imdb_eval)
+remover_imdb_trained = train(imdb_train, imdb_eval)
+misspell_imdb_trained = train(imdb_train, imdb_eval)
+# save_results(imdb_trainer, "imdb")
+# save_results(cr_trainer, "cr")
+# save_results(kr_trainer, "kr")
+# save_results(r_trainer, "r")
+# save_results(mr_trainer, "mr")
+# save_results(remover_trainer, "remover")
+# save_results(misspelled_trainer, "misspelled")
+# save_results(cr_imdb_eval_trainer, "cr_imdb_eval")
+# save_results(kr_imdb_eval_trainer, "kr_imdb_eval")
+# save_results(mr_imdb_eval_trainer, "mr_imdb_eval")
+# save_results(r_imdb_eval_trainer, "r_imdb_eval")
+# save_results(remover_imdb_eval_trainer, "remover_imdb_eval")
+# save_results(misspelled_imdb_eval_trainer, "misspelled_imdb_eval")
+# save_results(cr_imdb_trainer, "cr_imdb")
+# save_results(kr_imdb_trainer, "kr_imdb")
+# save_results(mr_imdb_trainer, "mr_imdb")
+# save_results(r_imdb_trainer, "r_imdb")
+# save_results(remover_imdb_trainer, "remover_imdb")
+# save_results(misspelled_imdb_trainer, "misspelled_imdb")
