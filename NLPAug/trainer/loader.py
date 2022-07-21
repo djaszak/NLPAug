@@ -1,4 +1,4 @@
-import pickle
+import pandas as pd
 from datasets import (
     Dataset,
     load_dataset,
@@ -15,7 +15,7 @@ from transformers import (
     DefaultDataCollator,
     TrainingArguments,
     Trainer,
-    TFAutoModelForSequenceClassification
+    TFAutoModelForSequenceClassification,
 )
 import multiprocessing
 from NLPAug.character import (
@@ -64,23 +64,49 @@ def compute_metrics(p):
     return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
 
 
-def train(training_set: Dataset):
-    splitted = training_set.train_test_split(test_size=0.2, seed=42)
-    trainer_kwargs = {
-        "model": model,
-        "args": training_args,
-        "train_dataset": splitted["train"],
-        "eval_dataset": splitted["test"],
-        "compute_metrics": compute_metrics,
-    }
+def tensorflow_training_wrapper(
+    train_dataset: Dataset, eval_dataset: Dataset
+) -> TFAutoModelForSequenceClassification:
+    tf_eval_dataset = eval_dataset.to_tf_dataset(
+        columns=["attention_mask", "input_ids", "token_type_ids"],
+        label_cols=["labels"],
+        shuffle=False,
+        collate_fn=data_collator,
+        batch_size=8,
+    )
 
-    return Trainer(**trainer_kwargs).train()
+    tf_train_dataset = train_dataset.to_tf_dataset(
+        columns=["attention_mask", "input_ids", "token_type_ids"],
+        label_cols=["labels"],
+        shuffle=True,
+        collate_fn=data_collator,
+        batch_size=8,
+    )
+
+    model = TFAutoModelForSequenceClassification.from_pretrained(
+        "bert-base-cased", num_labels=2
+    )
+
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=5e-5),
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        metrics=[
+            tf.metrics.SparseCategoricalAccuracy(),
+            tf.metrics.Accuracy(),
+            tf.metrics.Precision(),
+            tf.metrics.Recall(),
+        ],
+    )
+    history = model.fit(tf_train_dataset, validation_data=eval_dataset, epochs=3)
+    return history, model
 
 
-def save_results(trainer: Trainer, name):
-    results = trainer.train()
-    metrics = results.metrics
-    trainer.save_metrics(f"{name}_test", metrics)
+def save_hist_model(history, model, name):
+    hist_df = pd.DataFrame(history.history)
+    hist_json_file = f"{name}_history.json"
+    with open(hist_json_file, mode="w") as f:
+        hist_df.to_json(f)
+    model.save_pretrained(f"/tmp/{name}_custom_model")
 
 
 imdb_dataset = load_dataset("imdb")
@@ -92,81 +118,57 @@ imdb_train = imdb_dataset[TRAIN]
 imdb_eval = imdb_dataset[TEST]
 
 # # Augmented test data
-cr_train = imdb_train.select(range(5000)).map(
+cr_train = imdb_train.map(
     complete_randomizer_data, num_proc=multiprocessing.cpu_count()
 )
-# cr_trained = train(cr_train)
-# print("This is the evaluation that should be printed", cr_trained)
+kr_train = imdb_train.map(keyboard_replacer_data, num_proc=multiprocessing.cpu_count())
+mr_train = imdb_train.map(mid_randomizer_data, num_proc=multiprocessing.cpu_count())
+rs_train = imdb_train.map(random_switcher_data, num_proc=multiprocessing.cpu_count())
+inserter_train = imdb_train.map(inserter_data, num_proc=multiprocessing.cpu_count())
+remover_train = imdb_train.map(remover_data, num_proc=multiprocessing.cpu_count())
+misspell_train = imdb_train.map(misspell_data, num_proc=multiprocessing.cpu_count())
 
-# Load trained model
-# model_path = "test_trainer/checkpoint-500"
-# model = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=2)
-
-# # Define test trainer
-# test_trainer = Trainer(model)
-# print(test_trainer.predict(imdb_eval.select(range(1000))))
-
-tf_train_dataset = cr_train.to_tf_dataset(
-    columns=["attention_mask", "input_ids", "token_type_ids"],
-    label_cols=["labels"],
-    shuffle=True,
-    collate_fn=data_collator,
-    batch_size=8,
-)
-
-tf_validation_dataset = imdb_eval.select(range(500)).to_tf_dataset(
-    columns=["attention_mask", "input_ids", "token_type_ids"],
-    label_cols=["labels"],
-    shuffle=False,
-    collate_fn=data_collator,
-    batch_size=8,
-)
-
-model = TFAutoModelForSequenceClassification.from_pretrained("bert-base-cased", num_labels=2)
-
-model.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=5e-5),
-    loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-    metrics=tf.metrics.SparseCategoricalAccuracy(),
-)
-
-history = model.fit(tf_train_dataset, validation_data=tf_validation_dataset, epochs=3)
-
-print(history)
-
-# kr_train = imdb_train.map(keyboard_replacer_data, num_proc=multiprocessing.cpu_count())
-# mr_train = imdb_train.map(mid_randomizer_data, num_proc=multiprocessing.cpu_count())
-# rs_train = imdb_train.map(random_switcher_data, num_proc=multiprocessing.cpu_count())
-# inserter_train = imdb_train.map(inserter_data, num_proc=multiprocessing.cpu_count())
-# remover_train = imdb_train.map(remover_data, num_proc=multiprocessing.cpu_count())
-# misspell_train = imdb_train.map(misspell_data, num_proc=multiprocessing.cpu_count())
-
-# # Extend imdb_train by augmented data
-# cr_imdb_train = concatenate_datasets([imdb_train, cr_train])
-# kr_imdb_train = concatenate_datasets([imdb_train, kr_train])
-# mr_imdb_train = concatenate_datasets([imdb_train, mr_train])
-# rs_imdb_train = concatenate_datasets([imdb_train, rs_train])
-# inserter_imdb_train = concatenate_datasets([imdb_train, inserter_train])
-# remover_imdb_train = concatenate_datasets([imdb_train, remover_train])
-# misspell_imdb_train = concatenate_datasets([imdb_train, misspell_train])
+# Extend imdb_train by augmented data
+cr_imdb_train = concatenate_datasets([imdb_train, cr_train])
+kr_imdb_train = concatenate_datasets([imdb_train, kr_train])
+mr_imdb_train = concatenate_datasets([imdb_train, mr_train])
+rs_imdb_train = concatenate_datasets([imdb_train, rs_train])
+inserter_imdb_train = concatenate_datasets([imdb_train, inserter_train])
+remover_imdb_train = concatenate_datasets([imdb_train, remover_train])
+misspell_imdb_train = concatenate_datasets([imdb_train, misspell_train])
 
 # Baseline training
-# imdb_trained = train(imdb_train, imdb_eval)
+history, model = tensorflow_training_wrapper(imdb_train, imdb_eval)
+save_hist_model(history, model, 'imdb')
 
-# # Only augmented datasets
-# cr_trained = train(imdb_train, imdb_eval)
-# kr_trained = train(imdb_train, imdb_eval)
-# mr_trained = train(imdb_train, imdb_eval)
-# rs_trained = train(imdb_train, imdb_eval)
-# inserter_trained = train(imdb_train, imdb_eval)
-# remover_trained = train(imdb_train, imdb_eval)
-# misspell_trained = train(imdb_train, imdb_eval)
+# Augmented training
+history, model = tensorflow_training_wrapper(cr_train, imdb_eval)
+save_hist_model(history, model, 'cr')
+history, model = tensorflow_training_wrapper(kr_train, imdb_eval)
+save_hist_model(history, model, 'kr')
+history, model = tensorflow_training_wrapper(mr_train, imdb_eval)
+save_hist_model(history, model, 'mr')
+history, model = tensorflow_training_wrapper(rs_train, imdb_eval)
+save_hist_model(history, model, 'rs')
+history, model = tensorflow_training_wrapper(inserter_train, imdb_eval)
+save_hist_model(history, model, 'inserter')
+history, model = tensorflow_training_wrapper(remover_train, imdb_eval)
+save_hist_model(history, model, 'remover')
+history, model = tensorflow_training_wrapper(misspell_train, imdb_eval)
+save_hist_model(history, model, 'misspell')
 
-# # Baseline data extended by augmented data (50k data instead of 25k)
-# cr_imdb_trained = train(imdb_train, imdb_eval)
-# kr_imdb_trained = train(imdb_train, imdb_eval)
-# mr_imdb_trained = train(imdb_train, imdb_eval)
-# rs_imdb_trained = train(imdb_train, imdb_eval)
-# inserter_imdb_trained = train(imdb_train, imdb_eval)
-# remover_imdb_trained = train(imdb_train, imdb_eval)
-# misspell_imdb_trained = train(imdb_train, imdb_eval)
+# Augmented training
+history, model = tensorflow_training_wrapper(cr_imdb_train, imdb_eval)
+save_hist_model(history, model, 'cr_imdb')
+history, model = tensorflow_training_wrapper(kr_imdb_train, imdb_eval)
+save_hist_model(history, model, 'kr_imdb')
+history, model = tensorflow_training_wrapper(mr_imdb_train, imdb_eval)
+save_hist_model(history, model, 'mr_imdb')
+history, model = tensorflow_training_wrapper(rs_imdb_train, imdb_eval)
+save_hist_model(history, model, 'rs_imdb')
+history, model = tensorflow_training_wrapper(inserter_imdb_train, imdb_eval)
+save_hist_model(history, model, 'inserter_imdb')
+history, model = tensorflow_training_wrapper(remover_imdb_train, imdb_eval)
+save_hist_model(history, model, 'remover_imdb')
+history, model = tensorflow_training_wrapper(misspell_imdb_train, imdb_eval)
+save_hist_model(history, model, 'misspell_imdb')
