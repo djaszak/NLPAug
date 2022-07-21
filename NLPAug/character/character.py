@@ -43,7 +43,7 @@ class Character:
         working_directory = Path(os.getcwd())
         # path = working_directory / "data" / "missp_data.json"
         path = Path(
-            "/home/dennis/Uni/GrosserBeleg/NLPAug/NLPAug/character/data/missp_data.json"
+            "/home/djaszak/NLPAug/NLPAug/character/data/missp_data.json"
         )
         with path.open() as f:
             self.missp = json.load(f)
