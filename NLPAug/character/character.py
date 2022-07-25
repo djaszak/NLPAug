@@ -173,7 +173,10 @@ def augment_data(data, method: str):
         for token in t.tokenize(data):
             if token.isalpha():
                 augmented_token = getattr(augmenter, method)([token])
-                new_line.append(augmented_token[0])
+                try:
+                    new_line.append(augmented_token[0])
+                except IndexError:
+                    pass
             else:
                 new_line.append(token)
     except TypeError:

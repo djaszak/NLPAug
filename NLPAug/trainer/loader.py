@@ -92,12 +92,12 @@ def tensorflow_training_wrapper(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         metrics=[
             tf.metrics.SparseCategoricalAccuracy(),
-            tf.metrics.Accuracy(),
-            tf.metrics.Precision(),
-            tf.metrics.Recall(),
+            # tf.metrics.Accuracy(),
+            # tf.metrics.Precision(),
+            # tf.metrics.Recall(),
         ],
     )
-    history = model.fit(tf_train_dataset, validation_data=eval_dataset, epochs=3)
+    history = model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=3)
     return history, model
 
 
@@ -117,7 +117,7 @@ imdb_dataset = imdb_dataset.map(
 imdb_train = imdb_dataset[TRAIN]
 imdb_eval = imdb_dataset[TEST]
 
-# # Augmented test data
+# Augmented test data
 cr_train = imdb_train.map(
     complete_randomizer_data, num_proc=multiprocessing.cpu_count()
 )
@@ -157,7 +157,7 @@ save_hist_model(history, model, 'remover')
 history, model = tensorflow_training_wrapper(misspell_train, imdb_eval)
 save_hist_model(history, model, 'misspell')
 
-# Augmented training
+# Augmented and baseline training (50k data instead of 25k)
 history, model = tensorflow_training_wrapper(cr_imdb_train, imdb_eval)
 save_hist_model(history, model, 'cr_imdb')
 history, model = tensorflow_training_wrapper(kr_imdb_train, imdb_eval)
