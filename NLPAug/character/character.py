@@ -40,11 +40,7 @@ KEYBOARD_REPLACEMENTS = {
 
 class Character:
     def __init__(self):
-        working_directory = Path(os.getcwd())
-        # path = working_directory / "data" / "missp_data.json"
-        path = Path(
-            "/home/djaszak/NLPAug/NLPAug/character/data/missp_data.json"
-        )
+        path = Path(__file__).parents[0] / "data" / "missp_data.json"
         with path.open() as f:
             self.missp = json.load(f)
 
@@ -154,7 +150,7 @@ class Character:
 
 
 # TODO: Add datatype
-def augment_data(data, method: str):
+def augment_data(data, method: str, augment_probability: float = 1):
     """
 
     Args:
@@ -171,7 +167,7 @@ def augment_data(data, method: str):
     new_line = []
     try:
         for token in t.tokenize(data):
-            if token.isalpha():
+            if token.isalpha() and augment_probability >= random.random():
                 augmented_token = getattr(augmenter, method)([token])
                 try:
                     new_line.append(augmented_token[0])
@@ -186,36 +182,6 @@ def augment_data(data, method: str):
     return data
 
 
-def misspell_data(data):
-    data["text"] = augment_data(data["text"], "misspeller")
-    return data
-
-
-def random_switcher_data(data):
-    data["text"] = augment_data(data["text"], "random_switcher")
-    return data
-
-
-def mid_randomizer_data(data):
-    data["text"] = augment_data(data["text"], "mid_randomizer")
-    return data
-
-
-def complete_randomizer_data(data):
-    data["text"] = augment_data(data["text"], "complete_randomizer")
-    return data
-
-
-def keyboard_replacer_data(data):
-    data["text"] = augment_data(data["text"], "keyboard_replacer")
-    return data
-
-
-def remover_data(data):
-    data["text"] = augment_data(data["text"], "remover")
-    return data
-
-
-def inserter_data(data):
-    data["text"] = augment_data(data["text"], "inserter")
+def augment_hugginface_data(data, augmented_feature: str, mode: str, augment_probability: float = 1):
+    data[augmented_feature] = augment_data(data[augmented_feature], mode, augment_probability=augment_probability)
     return data
