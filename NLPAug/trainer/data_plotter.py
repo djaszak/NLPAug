@@ -23,43 +23,42 @@ for history in histories:
             x for x in history_json["val_sparse_categorical_accuracy"].values()
         ]
 
-        # plt.plot(
-        #     [y for y in history_json["sparse_categorical_accuracy"].keys()],
-        #     ,
-        #     label=history + "sparse_categorical_accuracy",
-        # )
 
-        # plt.plot(
-        #     [y for y in history_json["val_sparse_categorical_accuracy"].keys()],
-        #     [x for x in history_json["val_sparse_categorical_accuracy"].values()],
-        #     label=history + "val_sparse_categorical_accuracy",
-        # )
+def plot_things(title, plt):
+    plt.title(title)
+    plt.legend()
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
 
-print(accs)
-print(val_accs)
 # 5 subplots. 2 on top for accuracy and val_accuracy with only augmented, 2 below with augmented + imdb. imdb on top for itself.
 plt.subplot(2, 3, 1)
-
-plt.plot(x, accs["imdb_history.json"], label="imdb_history")
+plt.plot(x, accs["imdb_history.json"], label="imdb_history_acc")
+plt.plot(x, accs["imdb_history.json"], label="imdb_history_val_acc")
+plot_things('IMDB accuracy and validation accuracy', plt)
 
 plt.subplot(2, 3, 2)
+
 for history in accs:
-    if "imdb" in history and history != "imdb.json":
+    if "imdb" in history and history != "imdb_history.json":
         plt.plot(x, accs[history], label=history)
+plot_things('Concatenated datasets accuracies', plt)
+
 plt.subplot(2, 3, 3)
 for history in accs:
     if "imdb" not in history:
         plt.plot(x, accs[history], label=history)
+plot_things('Only augmented dataset accuracies', plt)
+
 plt.subplot(2, 3, 4)
 for history in val_accs:
-    if "imdb" in history and history != "imdb.json":
+    if "imdb" in history and history != "imdb_history.json":
         plt.plot(x, val_accs[history], label=history)
+plot_things('Concatenated datasets validation accuracies', plt)
+
 plt.subplot(2, 3, 5)
 for history in val_accs:
     if "imdb" not in history:
         plt.plot(x, val_accs[history], label=history)
-plt.title("Accuracy over epochs for different datasets")
-plt.legend()
-plt.xlabel("Epoch")
-plt.ylabel("Accuracy")
+plot_things('Only augmented dataset validation accuracies', plt)
+
 plt.show()
