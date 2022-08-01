@@ -51,7 +51,7 @@ def compute_metrics(p):
 
 
 def tensorflow_training_wrapper(
-    train_dataset: Dataset, eval_dataset: Dataset, test_dataset: Dataset, num_labels: int = 2, val_dict: dict = None
+    train_dataset: Dataset, eval_dataset: Dataset, test_dataset: Dataset, num_labels: int = 2, val_dict: dict = None, epochs: int = 3
 ) -> TFAutoModelForSequenceClassification:
     false_shuffle = {
         "columns": ["attention_mask", "input_ids", "token_type_ids"],
@@ -85,8 +85,8 @@ def tensorflow_training_wrapper(
             # tf.metrics.Recall(),
         ],
     )
-    history = model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=3)
-    evalutation = model.evaluate(test_dataset)
+    history = model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=epochs)
+    evalutation = model.evaluate(tf_test_dataset)
     return history, model, evalutation
 
 

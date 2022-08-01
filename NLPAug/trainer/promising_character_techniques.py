@@ -74,31 +74,31 @@ mr_train_8, inserter_train_8, misspell_train_8 = augment_good_techniques(
     imdb_train, 0.8
 )
 
-history, model, evaluation = tensorflow_training_wrapper(mr_train_2, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(mr_train_2, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_mr_2")
-history, model, evaluation = tensorflow_training_wrapper(mr_train_4, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(mr_train_4, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_mr_4")
-history, model, evaluation = tensorflow_training_wrapper(mr_train_6, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(mr_train_6, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_mr_6")
-history, model, evaluation = tensorflow_training_wrapper(mr_train_8, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(mr_train_8, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_mr_8")
 
-history, model, evaluation = tensorflow_training_wrapper(inserter_train_2, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(inserter_train_2, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_inserter_2")
-history, model, evaluation = tensorflow_training_wrapper(inserter_train_4, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(inserter_train_4, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_inserter_4")
-history, model, evaluation = tensorflow_training_wrapper(inserter_train_6, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(inserter_train_6, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_inserter_6")
-history, model, evaluation = tensorflow_training_wrapper(inserter_train_8, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(inserter_train_8, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_inserter_8")
 
-history, model, evaluation = tensorflow_training_wrapper(misspell_train_2, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(misspell_train_2, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_misspell_2")
-history, model, evaluation = tensorflow_training_wrapper(misspell_train_4, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(misspell_train_4, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_misspell_4")
-history, model, evaluation = tensorflow_training_wrapper(misspell_train_6, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(misspell_train_6, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_misspell_6")
-history, model, evaluation = tensorflow_training_wrapper(misspell_train_8, imdb_eval, imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(misspell_train_8, imdb_eval, imdb_test, epochs=10)
 save_hist_model(history, model, "imdb_misspell_8")
 
 
@@ -116,48 +116,48 @@ mr_train_8, inserter_train_8, misspell_train_8 = augment_good_techniques(
     emotion_train, 0.8
 )
 
-history, model, evaluation = tensorflow_training_wrapper(emotion_train, emotion_eval, emotion_test, num_labels=6)
+history, model, evaluation = tensorflow_training_wrapper(emotion_train, emotion_eval, emotion_test, num_labels=6, epochs=10)
 save_hist_model(history, model, "emotion")
 
-history, model, evaluation = tensorflow_training_wrapper(mr_train_2, emotion_eval, emotion_test, num_labels=6)
+history, model, evaluation = tensorflow_training_wrapper(mr_train_2, emotion_eval, emotion_test, num_labels=6, epochs=10)
 save_hist_model(history, model, "emotion_mr_2")
-history, model, evaluation = tensorflow_training_wrapper(mr_train_4, emotion_eval, emotion_test, num_labels=6)
+history, model, evaluation = tensorflow_training_wrapper(mr_train_4, emotion_eval, emotion_test, num_labels=6, epochs=10)
 save_hist_model(history, model, "emotion_mr_4")
-history, model, evaluation = tensorflow_training_wrapper(mr_train_6, emotion_eval, emotion_test, num_labels=6)
+history, model, evaluation = tensorflow_training_wrapper(mr_train_6, emotion_eval, emotion_test, num_labels=6, epochs=10)
 save_hist_model(history, model, "emotion_mr_6")
-history, model, evaluation = tensorflow_training_wrapper(mr_train_8, emotion_eval, emotion_test, num_labels=6)
+history, model, evaluation = tensorflow_training_wrapper(mr_train_8, emotion_eval, emotion_test, num_labels=6, epochs=10)
 save_hist_model(history, model, "emotion_mr_8")
 
 history, model, evaluation = tensorflow_training_wrapper(
-    inserter_train_2, emotion_eval, emotion_test, num_labels=6
+    inserter_train_2, emotion_eval, emotion_test, num_labels=6, epochs=10
 )
 save_hist_model(history, model, "emotion_inserter_2")
 history, model, evaluation = tensorflow_training_wrapper(
-    inserter_train_4, emotion_eval, emotion_test, num_labels=6
+    inserter_train_4, emotion_eval, emotion_test, num_labels=6, epochs=10
 )
 save_hist_model(history, model, "emotion_inserter_4")
 history, model, evaluation = tensorflow_training_wrapper(
-    inserter_train_6, emotion_eval, emotion_test, num_labels=6
+    inserter_train_6, emotion_eval, emotion_test, num_labels=6, epochs=10
 )
 save_hist_model(history, model, "emotion_inserter_6")
 history, model, evaluation = tensorflow_training_wrapper(
-    inserter_train_8, emotion_eval, emotion_test, num_labels=6
+    inserter_train_8, emotion_eval, emotion_test, num_labels=6, epochs=10
 )
 save_hist_model(history, model, "emotion_inserter_8")
 
 history, model, evaluation = tensorflow_training_wrapper(
-    misspell_train_2, emotion_eval, emotion_test, num_labels=6
+    misspell_train_2, emotion_eval, emotion_test, num_labels=6, epochs=10
 )
 save_hist_model(history, model, "emotion_misspell_2")
 history, model, evaluation = tensorflow_training_wrapper(
-    misspell_train_4, emotion_eval, emotion_test, num_labels=6
+    misspell_train_4, emotion_eval, emotion_test, num_labels=6, epochs=10
 )
 save_hist_model(history, model, "emotion_misspell_4")
 history, model, evaluation = tensorflow_training_wrapper(
-    misspell_train_6, emotion_eval, emotion_test, num_labels=6
+    misspell_train_6, emotion_eval, emotion_test, num_labels=6, epochs=10
 )
 save_hist_model(history, model, "emotion_misspell_6")
 history, model, evaluation = tensorflow_training_wrapper(
-    misspell_train_8, emotion_eval, emotion_test, num_labels=6
+    misspell_train_8, emotion_eval, emotion_test, num_labels=6, epochs=10
 )
 save_hist_model(history, model, "emotion_misspell_8")
