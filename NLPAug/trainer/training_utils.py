@@ -51,15 +51,15 @@ def compute_metrics(p):
 
 
 def tensorflow_training_wrapper(
-    train_dataset: Dataset, eval_dataset: Dataset, num_labels: int = 2
+    train_dataset: Dataset, eval_dataset: Dataset, test_dataset: Dataset, num_labels: int = 2, val_dict: dict = None
 ) -> TFAutoModelForSequenceClassification:
-    tf_eval_dataset = eval_dataset.to_tf_dataset(
-        columns=["attention_mask", "input_ids", "token_type_ids"],
-        label_cols=["labels"],
-        shuffle=False,
-        collate_fn=data_collator,
-        batch_size=8,
-    )
+    false_shuffle = {
+        "columns": ["attention_mask", "input_ids", "token_type_ids"],
+        "label_cols": ["labels"],
+        "shuffle": False,
+        "collate_fn": data_collator,
+        "batch_size": 8,}
+    tf_eval_dataset = eval_dataset.to_tf_dataset(**false_shuffle)
 
     tf_train_dataset = train_dataset.to_tf_dataset(
         columns=["attention_mask", "input_ids", "token_type_ids"],
@@ -68,6 +68,8 @@ def tensorflow_training_wrapper(
         collate_fn=data_collator,
         batch_size=8,
     )
+
+    tf_test_dataset = test_dataset.to_tf_dataset(**false_shuffle)
 
     model = TFAutoModelForSequenceClassification.from_pretrained(
         "bert-base-cased", num_labels=num_labels
@@ -84,12 +86,18 @@ def tensorflow_training_wrapper(
         ],
     )
     history = model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=3)
-    return history, model
+    evalutation = model.evaluate(test_dataset)
+    return history, model, evalutation
 
 
-def save_hist_model(history, model, name):
+def save_hist_model(history, model, evaluation, name):
     hist_df = pd.DataFrame(history.history)
+    hist_df.insert(0, "evaluation_accuracy", evaluation[1])
     hist_json_file = f"{name}_history.json"
     with open(hist_json_file, mode="w") as f:
         hist_df.to_json(f)
+    eval_json_file = f"{name}_eval_accuracy.json"
+    with open(eval_json_file, mode="w") as f:
+        {'accuracy': evaluation[1]}.to_json()
+        hist_df.to_json(f)        
     model.save_pretrained(f"/tmp/{name}_custom_model")
