@@ -92,7 +92,7 @@ def tensorflow_training_wrapper(
 
 def save_hist_model(history, model, evaluation, name):
     hist_df = pd.DataFrame(history.history)
-    print("Evaluation while saving: ". evaluation)
+    print("Evaluation while saving: ", evaluation)
     hist_df.insert(0, "evaluation_accuracy", evaluation[1])
     hist_json_file = f"{name}_history.json"
     with open(hist_json_file, mode="w") as f:
