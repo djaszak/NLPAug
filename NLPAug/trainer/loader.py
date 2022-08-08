@@ -17,7 +17,7 @@ imdb_dataset.pop("unsupervised")
 imdb_dataset = imdb_dataset.map(
     tokenize_function, batched=True, num_proc=multiprocessing.cpu_count()
 )
-split = imdb_dataset[TRAIN].train_test_split(0.8)
+split = imdb_dataset[TRAIN].train_test_split(0.8, seed=42)
 imdb_train = split[TRAIN]
 imdb_eval = split[TEST]
 imdb_test = imdb_dataset[TEST]
