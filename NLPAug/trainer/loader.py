@@ -7,7 +7,6 @@ from NLPAug.character.character import augment_hugginface_data
 from NLPAug.trainer.training_utils import (
     tokenize_function,
     tensorflow_training_wrapper,
-    save_hist_model,
 )
 
 TRAIN = "train"
@@ -73,39 +72,23 @@ inserter_imdb_train = concatenate_datasets([imdb_train, inserter_train])
 remover_imdb_train = concatenate_datasets([imdb_train, remover_train])
 misspell_imdb_train = concatenate_datasets([imdb_train, misspell_train])
 
-eval_dict = {}
-
 # Baseline training
-history, model, evaluation = tensorflow_training_wrapper(imdb_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "imdb")
+history, model, evaluation = tensorflow_training_wrapper(imdb_train, imdb_eval, "imdb", imdb_test)
+
 # Augmented training
-history, model, evaluation = tensorflow_training_wrapper(cr_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "cr")
-history, model, evaluation = tensorflow_training_wrapper(kr_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "kr")
-history, model, evaluation = tensorflow_training_wrapper(mr_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "mr")
-history, model, evaluation = tensorflow_training_wrapper(rs_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "rs")
-history, model, evaluation = tensorflow_training_wrapper(inserter_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "inserter")
-history, model, evaluation = tensorflow_training_wrapper(remover_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "remover")
-history, model, evaluation = tensorflow_training_wrapper(misspell_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "misspell")
+history, model, evaluation = tensorflow_training_wrapper(cr_train, imdb_eval, "cr", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(kr_train, imdb_eval, "kr", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(mr_train, imdb_eval, "mr", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(rs_train, imdb_eval, "rs", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(inserter_train, imdb_eval, "inserter", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(remover_train, imdb_eval, "remover", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(misspell_train, imdb_eval, "misspell", imdb_test)
 
 # Augmented and baseline training (50k data instead of 25k)
-history, model, evaluation = tensorflow_training_wrapper(cr_imdb_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "cr_imdb")
-history, model, evaluation = tensorflow_training_wrapper(kr_imdb_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "kr_imdb")
-history, model, evaluation = tensorflow_training_wrapper(mr_imdb_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "mr_imdb")
-history, model, evaluation = tensorflow_training_wrapper(rs_imdb_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "rs_imdb")
-history, model, evaluation = tensorflow_training_wrapper(inserter_imdb_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "inserter_imdb")
-history, model, evaluation = tensorflow_training_wrapper(remover_imdb_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "remover_imdb")
-history, model, evaluation = tensorflow_training_wrapper(misspell_imdb_train, imdb_eval, imdb_test)
-save_hist_model(history, model, "misspell_imdb")
+history, model, evaluation = tensorflow_training_wrapper(cr_imdb_train, imdb_eval, "cr_imdb", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(kr_imdb_train, imdb_eval, "kr_imdb", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(mr_imdb_train, imdb_eval, "mr_imdb", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(rs_imdb_train, imdb_eval, "rs_imdb", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(inserter_imdb_train, imdb_eval, "inserter_imdb", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(remover_imdb_train, imdb_eval, "remover_imdb", imdb_test)
+history, model, evaluation = tensorflow_training_wrapper(misspell_imdb_train, imdb_eval, "misspell_imdb", imdb_test)

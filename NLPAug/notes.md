@@ -17,3 +17,10 @@
   * Random seed als const fuer den Split um Methoden vergleichbar zu halten
   * Seed festsetze: Python random, numpy, pytorch(deterministic results)
   * Forschungsprojekt Praesi: 13.09, 20-25 min, Folien auf Englisch, Praesi auf Deutsch 
+
+### 04/08/2022
+* Wenn Graphen dann y-achse immer gleich
+* matplotlib interval tick integers googlen
+* Analyseansatz: Gucken, welche saetze werden falsch vorrausgesagt um schwaechen von baseline und augmentierung zu filtern -> gezielte augmentierung
+* Haeufigste falsch vorrausgesagte Woerter finden
+* Evaluierungsdaten haendisch falsch tippen
