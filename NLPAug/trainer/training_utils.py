@@ -104,5 +104,3 @@ def tensorflow_training_wrapper(
     save_hist_model(history, model, evaluation, saving_name)
 
     return history, model, evaluation
-
-
