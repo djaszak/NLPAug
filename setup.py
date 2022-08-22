@@ -1,14 +1,14 @@
 from setuptools import setup
 
 setup(
-    name="NLPAug",
+    name="nlp_aug",
     version="0.1.0",
     description="A toolkit to augment NLP datasets",
-    url="https://github.com/djaszak/NLPAug",
+    url="https://github.com/djaszak/nlp_aug",
     author="Dennis Jaszak",
     author_email="dennis-j@hotmail.de",
     license="MIT License",
-    packages=["NLPAug"],
+    packages=["nlp_aug"],
     install_requires=[],
     classifiers=[
         "Development Status :: 1 - In development",
