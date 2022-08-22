@@ -1,12 +1,10 @@
-from dataclasses import dataclass
 import json
-import os
 import random
 import string
 
-from datasets import load_dataset
-from nltk.tokenize import TreebankWordTokenizer, TreebankWordDetokenizer
 from pathlib import Path
+
+from nlp_aug.utilities.augment_utils import augment_data
 
 KEYBOARD_REPLACEMENTS = {
     "q": ["w", "s", "a"],
@@ -66,8 +64,7 @@ class Character:
                 while pos_1 == pos_2:
                     pos_2 = random.randint(0, len(word) - 1)
                 new_word = list(word)
-                new_word[pos_1] = word[pos_2]
-                new_word[pos_2] = word[pos_1]
+                new_word[pos_1], new_word[pos_2] = new_word[pos_2], new_word[pos_1]
                 new_words.append("".join(new_word))
             else:
                 new_words.append(word)
@@ -149,39 +146,16 @@ class Character:
         return new_words
 
 
-# TODO: Add datatype
-def augment_data(data, method: str, augment_probability: float = 1):
-    """
-
-    Args:
-        method: The augmentation method that should be used.
-        data: Data from a specific dataset
-
-    Returns:
-        Augmented data.
-    """
-    t = TreebankWordTokenizer()
-    d = TreebankWordDetokenizer()
-    augmenter = Character()
-
-    new_line = []
-    try:
-        for token in t.tokenize(data):
-            if token.isalpha() and augment_probability >= random.random():
-                augmented_token = getattr(augmenter, method)([token])
-                try:
-                    new_line.append(augmented_token[0])
-                except IndexError:
-                    pass
-            else:
-                new_line.append(token)
-    except TypeError:
-        print(type(data))
-    data = d.detokenize(new_line)
-
-    return data
+augmenter = Character()
 
 
-def augment_hugginface_data(data, augmented_feature: str, mode: str, augment_probability: float = 1):
-    data[augmented_feature] = augment_data(data[augmented_feature], mode, augment_probability=augment_probability)
+def augment_hugginface_data(
+    data, augmented_feature: str, mode: str, augment_probability: float = 1
+):
+    data[augmented_feature] = augment_data(
+        data[augmented_feature],
+        augmenter,
+        mode,
+        augment_probability=augment_probability,
+    )
     return data

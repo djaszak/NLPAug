@@ -1,6 +1,6 @@
 import argparse
 
-from NLPAug.character.character import Character
+from nlp_aug.character.character import Character
 
 parser = argparse.ArgumentParser(
     description="Augment data corpora with different possible ."

@@ -4,8 +4,8 @@ from datasets import (
     concatenate_datasets,
 )
 import multiprocessing
-from NLPAug.character.character import augment_hugginface_data
-from NLPAug.trainer.training_utils import (
+from nlp_aug.character.character import augment_hugginface_data
+from nlp_aug.trainer.training_utils import (
     tokenize_function,
     tensorflow_training_wrapper,
     save_hist_model,

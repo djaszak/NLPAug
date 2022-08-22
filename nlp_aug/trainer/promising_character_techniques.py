@@ -1,4 +1,4 @@
-from NLPAug.trainer.training_utils import (
+from nlp_aug.trainer.training_utils import (
     tensorflow_training_wrapper,
     save_hist_model,
     tokenize_function,
@@ -6,7 +6,7 @@ from NLPAug.trainer.training_utils import (
 from datasets import (
     load_dataset,
 )
-from NLPAug.character.character import augment_hugginface_data
+from nlp_aug.character.character import augment_hugginface_data
 import multiprocessing
 
 imdb_dataset = load_dataset("imdb")
