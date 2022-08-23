@@ -159,3 +159,12 @@ def augment_hugginface_data(
         augment_probability=augment_probability,
     )
     return data
+
+
+data = "I don't watch the news, I read the paper"
+print(augment_data(
+        data,
+        augmenter,
+        'complete_randomizer',
+        augment_probability=1,
+    ))
