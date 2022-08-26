@@ -17,7 +17,6 @@ def augment_data(data, augmenter, method: str, augment_probability: float = 1):
     d = TreebankWordDetokenizer()
 
     new_line = []
-    print(t.tokenize(data))
     try:
         for token in t.tokenize(data):
             if token.isalpha() and augment_probability >= random.random():

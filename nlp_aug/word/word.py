@@ -1,8 +1,13 @@
+from datasets import (
+    load_dataset,
+    concatenate_datasets,
+)
 import random
 import spacy
 
 import nltk
 from nltk.corpus import wordnet as wn
+from nltk.tokenize import TreebankWordDetokenizer
 from spacy.matcher import Matcher
 
 
@@ -80,13 +85,19 @@ class SynonymReplacer:
 
         doc = self.nlp(data)
 
-        replacements = {}
+        new_doc = []
 
-        for index, token in enumerate(doc):
+        for token in doc:
             if self.replacement_rule(token):
-                replacements[token.idx] = self.synonym_selection(token)
+                replacement = self.synonym_selection(token)
+                replacement = replacement.replace("_", " ")
+                new_doc.append(self.synonym_selection(token))
+            else:
+                new_doc.append(token.text)
 
-        return doc, replacements
+        d = TreebankWordDetokenizer()
+
+        return d.detokenize(new_doc)
 
 
 class BaseReplacer(SynonymReplacer):
@@ -111,46 +122,28 @@ class BaseReplacer(SynonymReplacer):
 
             synonyms.remove(token.text)
 
-        return list(set(synonyms))
+        try:
+            return random.choice(list(set(synonyms)))
+        except IndexError:
+            return ""
 
 
 replacer = BaseReplacer()
 
-nlp = spacy.load("en_core_web_sm")
-doc = nlp(
-    "I didn't watch the news yesterday, I read the paper. It's pretty nice outside."
+print(
+    replacer.engine(
+        "I didn't watch the news yesterday, I read the paper. It's pretty nice outside."
+    )
 )
-for token in doc:
-    print(token.text, " ", replacer.synonym_selection(token))
 
-print(replacer.engine("I didn't watch the news yesterday, I read the paper. It's pretty nice outside."))
+imdb_dataset = load_dataset("imdb", split='train')
+cr_train = (
+    imdb_dataset
+    # .select(range(100))
+    .map(
+        replacer.engine,
+        num_proc=4,
+    )
+)
 
-
-# nlp = spacy.load("en_core_web_sm")
-# doc = nlp("I don't watch the news, I read the paper. It's pretty nice outside.")
-# for token in doc:
-#     print(
-#         token.text,
-#         token.lemma_,
-#         token.pos_,
-#         token.tag_,
-#         token.dep_,
-#         token.shape_,
-#         token.is_alpha,
-#         token.is_stop,
-#         type(token),
-#     )
-
-# print(spacy.explain("ROOT"))
-# print(doc)
-# print(type(doc))
-
-# nltk.download('wordnet')
-# nltk.download('omw-1.4')
-
-# synonyms = []
-
-# for syn in wn.synsets("not"):
-#     for lm in syn.lemmas():
-#         synonyms.append(lm.name())
-# print(set(synonyms))
+print(cr_train['text'])
