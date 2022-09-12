@@ -71,7 +71,7 @@ class SynonymReplacer:
             text += tok[buffer_start:].text
         return text
 
-    def engine(self, data: str) -> str:
+    def engine(self, data: str, augmented_feature: str) -> str:
         """Using `replacement_rule()` and `synonym_selection()` a string is augmented
 
         Args:
@@ -82,8 +82,8 @@ class SynonymReplacer:
         Returns:
             str: The augmented string.
         """
-
-        doc = self.nlp(data)
+        data_feature = data[augmented_feature]
+        doc = self.nlp(data_feature)
 
         new_doc = []
 
@@ -91,13 +91,13 @@ class SynonymReplacer:
             if self.replacement_rule(token):
                 replacement = self.synonym_selection(token)
                 replacement = replacement.replace("_", " ")
-                new_doc.append(self.synonym_selection(token))
+                new_doc.append(replacement)
             else:
                 new_doc.append(token.text)
 
         d = TreebankWordDetokenizer()
-
-        return d.detokenize(new_doc)
+        data[augmented_feature] = d.detokenize(new_doc)
+        return data
 
 
 class BaseReplacer(SynonymReplacer):
@@ -115,35 +115,29 @@ class BaseReplacer(SynonymReplacer):
         synonyms = []
 
         if token.is_alpha and not token.is_stop:
+            # Only getting the same POS
             synsets = wn.synsets(token.lemma_, pos=getattr(wn, token.pos_))
             for syn in synsets:
                 for lm in syn.lemmas():
                     synonyms.append(lm.name())
-
-            synonyms.remove(token.text)
-
+            try: 
+                synonyms.remove(token.lemma_)
+            except ValueError:
+                print('Lemma: ', token.lemma_, ' not found in ', synonyms)
         try:
             return random.choice(list(set(synonyms)))
         except IndexError:
-            return ""
+            return token.text
 
 
 replacer = BaseReplacer()
 
-print(
-    replacer.engine(
-        "I didn't watch the news yesterday, I read the paper. It's pretty nice outside."
-    )
+imdb_dataset = load_dataset("imdb", split="train").select(range(10))
+cr_train = imdb_dataset.map(
+    replacer.engine,
+    num_proc=4,
+    fn_kwargs={'augmented_feature': 'text'}
 )
 
-imdb_dataset = load_dataset("imdb", split='train')
-cr_train = (
-    imdb_dataset
-    # .select(range(100))
-    .map(
-        replacer.engine,
-        num_proc=4,
-    )
-)
 
-print(cr_train['text'])
+print(cr_train["text"])
