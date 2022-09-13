@@ -1,13 +1,22 @@
+from multiprocessing.spawn import import_main_path
 from datasets import (
     load_dataset,
     concatenate_datasets,
 )
 import random
 import spacy
-
+import string
 import nltk
+import re
+
+import gensim.downloader as api
+from gensim.models import Word2Vec
+
+from multiprocessing import cpu_count
+
 from nltk.corpus import wordnet as wn
-from nltk.tokenize import TreebankWordDetokenizer
+from nltk.tokenize import TreebankWordTokenizer, TreebankWordDetokenizer
+
 from spacy.matcher import Matcher
 
 
@@ -34,19 +43,21 @@ class Word:
         pass
 
 
-class SynonymReplacer:
+class ReplIns:
+    """A class working as an interface for operations that are aiming at either replacing or inserting words by defined rules."""
+
     thesaurus = None
 
     def __init__(self, thesaurus=None):
         self.thesaurus = thesaurus
-        self.nlp = spacy.load("en_core_web_sm")
+        self.nlp = spacy.load("en_core_web_lg")
         self.matcher = Matcher(self.nlp.vocab)
 
     def replacement_rule(self, token: spacy.tokens.token.Token) -> bool:
         """Implement the rule used to replace as well as how to handle the given thesaurus."""
         pass
 
-    def synonym_selection(self, token: spacy.tokens.token.Token) -> str:
+    def candidate_selection(self, token: spacy.tokens.token.Token) -> str:
         """Implement the statistical approach which specific synonym from a list should be used."""
         pass
 
@@ -89,7 +100,7 @@ class SynonymReplacer:
 
         for token in doc:
             if self.replacement_rule(token):
-                replacement = self.synonym_selection(token)
+                replacement = self.candidate_selection(token)
                 replacement = replacement.replace("_", " ")
                 new_doc.append(replacement)
             else:
@@ -100,7 +111,7 @@ class SynonymReplacer:
         return data
 
 
-class BaseReplacer(SynonymReplacer):
+class BaseReplacer(ReplIns):
     def replacement_rule(
         self, token: spacy.tokens.token.Token, replacement_prob: float = 0.5
     ) -> bool:
@@ -111,7 +122,9 @@ class BaseReplacer(SynonymReplacer):
 
         return False
 
-    def synonym_selection(self, token: spacy.tokens.token.Token) -> str:
+
+class BaseSynonymReplacer(BaseReplacer):
+    def candidate_selection(self, token: spacy.tokens.token.Token) -> str:
         synonyms = []
 
         if token.is_alpha and not token.is_stop:
@@ -120,17 +133,35 @@ class BaseReplacer(SynonymReplacer):
             for syn in synsets:
                 for lm in syn.lemmas():
                     synonyms.append(lm.name())
-            try: 
+            try:
                 synonyms.remove(token.lemma_)
             except ValueError:
-                print('Lemma: ', token.lemma_, ' not found in ', synonyms)
+                print("Lemma: ", token.lemma_, " not found in ", synonyms)
         try:
             return random.choice(list(set(synonyms)))
         except IndexError:
             return token.text
 
 
-replacer = BaseReplacer()
+class BaseEmbeddingReplacer(BaseReplacer):
+    def __init__(self, thesaurus=None, word2vec: Word2Vec = None):
+        super().__init__(thesaurus)
+        self.word2vec = word2vec
+
+    def candidate_selection(self, token: spacy.tokens.token.Token) -> str:
+        if token.is_alpha and not token.is_stop:
+            # For this simple demo implementation, we are just using the most_similar.
+            try:
+                return self.word2vec.wv.most_similar(token.text)[0][0]
+            except Exception as e:
+                # print(e)
+                return token.text
+        
+        return token.text
+
+model = Word2Vec.load("word2vec.model")
+replacer = BaseEmbeddingReplacer(word2vec=model)
+
 
 imdb_dataset = load_dataset("imdb", split="train").select(range(10))
 cr_train = imdb_dataset.map(
@@ -138,6 +169,5 @@ cr_train = imdb_dataset.map(
     num_proc=4,
     fn_kwargs={'augmented_feature': 'text'}
 )
-
 
 print(cr_train["text"])

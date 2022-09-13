@@ -24,3 +24,8 @@
 * Analyseansatz: Gucken, welche saetze werden falsch vorrausgesagt um schwaechen von baseline und augmentierung zu filtern -> gezielte augmentierung
 * Haeufigste falsch vorrausgesagte Woerter finden
 * Evaluierungsdaten haendisch falsch tippen
+
+### Herausforderungen
+* Tokenization -> Word Embeddings
+* Ordentliches Einsetzen der neuen Woerter
+* Anpassungen an real life data
