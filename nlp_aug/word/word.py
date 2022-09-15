@@ -1,21 +1,12 @@
-from multiprocessing.spawn import import_main_path
-from datasets import (
-    load_dataset,
-    concatenate_datasets,
-)
 import random
 import spacy
-import string
-import nltk
-import re
 
-import gensim.downloader as api
+from datasets import load_dataset
+
 from gensim.models import Word2Vec
 
-from multiprocessing import cpu_count
-
 from nltk.corpus import wordnet as wn
-from nltk.tokenize import TreebankWordTokenizer, TreebankWordDetokenizer
+from nltk.tokenize import TreebankWordDetokenizer
 
 from spacy.matcher import Matcher
 
@@ -43,18 +34,20 @@ class Word:
         pass
 
 
-class ReplIns:
+class WordReplIns:
     """A class working as an interface for operations that are aiming at either replacing or inserting words by defined rules."""
 
     thesaurus = None
 
-    def __init__(self, thesaurus=None):
+    def __init__(self, nlp=None, thesaurus=None):
         self.thesaurus = thesaurus
-        self.nlp = spacy.load("en_core_web_lg")
+        if not nlp:
+            self.nlp = spacy.load("en_core_web_lg")
         self.matcher = Matcher(self.nlp.vocab)
 
     def replacement_rule(self, token: spacy.tokens.token.Token) -> bool:
         """Implement the rule used to replace as well as how to handle the given thesaurus."""
+        NotImplementedError
         pass
 
     def candidate_selection(self, token: spacy.tokens.token.Token) -> str:
@@ -111,7 +104,7 @@ class ReplIns:
         return data
 
 
-class BaseReplacer(ReplIns):
+class BaseReplacer(WordReplIns):
     def replacement_rule(
         self, token: spacy.tokens.token.Token, replacement_prob: float = 0.5
     ) -> bool:
