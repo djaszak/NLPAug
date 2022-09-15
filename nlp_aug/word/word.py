@@ -154,7 +154,6 @@ class BaseEmbeddingReplacer(BaseReplacer):
             try:
                 return self.word2vec.wv.most_similar(token.text)[0][0]
             except Exception as e:
-                # print(e)
                 return token.text
         
         return token.text
