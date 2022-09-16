@@ -54,10 +54,20 @@ class BaseCropper(PhraseAugmenter):
         sent = super().transformation(sent)
 
         subj_list = [token for token in sent if token.dep_ == dependency_focus]
-        head_list = [token.head for token in subj_list]
+
+        head_dict = {}
+
+        for subj in subj_list:
+            head = subj.head
+            head_dict[subj] = head
+            while head != head.head:
+                head_dict[subj] = head
+                head = head.head
+        
+        # head_list = [token.head for token in subj_list]
         
         print(subj_list)
-        print(head_list)
+        print(head_dict)
 
         return sent
 
