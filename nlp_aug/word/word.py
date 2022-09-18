@@ -75,7 +75,7 @@ class WordReplIns:
             text += tok[buffer_start:].text
         return text
 
-    def engine(self, data: str, augmented_feature: str) -> str:
+    def replace_engine(self, data: str, augmented_feature: str) -> str:
         """Using `replacement_rule()` and `synonym_selection()` a string is augmented
 
         Args:
@@ -98,6 +98,39 @@ class WordReplIns:
                 new_doc.append(replacement)
             else:
                 new_doc.append(token.text)
+
+        d = TreebankWordDetokenizer()
+        data[augmented_feature] = d.detokenize(new_doc)
+        return data
+
+    def insert_engine(self, data: str, augmented_feature: str) -> str:
+        """Using `replacement_rule()` and `synonym_selection()` a string is augmented
+
+        Args:
+            data (str): A list consisting out of strings that are representing a list of natural language
+                sentences. Every sentence is augmented in a way defined by the `replacement_rule()` and
+                the `synonym_selection()`.
+
+        Returns:
+            str: The augmented string.
+        """
+        data_feature = data[augmented_feature]
+        doc = self.nlp(data_feature)
+
+        new_doc = []
+        insertion_list = []
+
+        for token in doc:
+            if self.replacement_rule(token):
+                replacement = self.candidate_selection(token)
+                replacement = replacement.replace("_", " ")
+                insertion_list.append(replacement)
+                new_doc.append(token.text)
+            else:
+                new_doc.append(token.text)
+
+        for insert in insertion_list:
+            new_doc.insert(random.randint(0, len(new_doc)), insert)
 
         d = TreebankWordDetokenizer()
         data[augmented_feature] = d.detokenize(new_doc)
