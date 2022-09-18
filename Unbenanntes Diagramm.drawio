@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2022-09-18T09:37:12.195Z" agent="5.0 (Windows)" etag="UKEQS16AsvLS3dUy4iVE" version="20.3.2" type="github">
+<mxfile host="app.diagrams.net" modified="2022-09-18T09:53:42.475Z" agent="5.0 (Windows)" etag="C_nYHeVUSn2EjuMJAUBG" version="20.3.2" type="github">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
-    <mxGraphModel dx="1422" dy="803" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1422" dy="803" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
       <root>
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
@@ -8,9 +8,6 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="0jg4HZSSIyvqCbk5FdZA-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=52.5;entryPerimeter=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="0jg4HZSSIyvqCbk5FdZA-0" target="0jg4HZSSIyvqCbk5FdZA-9">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="0jg4HZSSIyvqCbk5FdZA-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="0jg4HZSSIyvqCbk5FdZA-0" target="0jg4HZSSIyvqCbk5FdZA-24">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="0jg4HZSSIyvqCbk5FdZA-0" value="&lt;div&gt;class Character()&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;random_switcher()&lt;/div&gt;&lt;div&gt;mid_randomizer()&lt;/div&gt;&lt;div&gt;complete_randomizer()&lt;/div&gt;&lt;div&gt;keyboard_replacer()&lt;/div&gt;&lt;div&gt;remover()&lt;/div&gt;&lt;div&gt;inserter()&lt;/div&gt;&lt;div&gt;misspeller()&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
@@ -26,6 +23,9 @@
           <mxGeometry x="232.5" y="220" width="145" height="80" as="geometry" />
         </mxCell>
         <mxCell id="0jg4HZSSIyvqCbk5FdZA-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="0jg4HZSSIyvqCbk5FdZA-13" target="0jg4HZSSIyvqCbk5FdZA-0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="0jg4HZSSIyvqCbk5FdZA-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="0jg4HZSSIyvqCbk5FdZA-13" target="0jg4HZSSIyvqCbk5FdZA-24">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="0jg4HZSSIyvqCbk5FdZA-13" value="replacement_engine(data) -&amp;gt; data" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
@@ -67,7 +67,7 @@
           <mxGeometry x="280" y="500" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="0jg4HZSSIyvqCbk5FdZA-24" value="&lt;div&gt;nltk&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;pl-v&quot;&gt;&lt;span data-hydro-click-hmac=&quot;0f363842ab2565535a6f08a61bde7684fb242c6e9448bd9bc8af4a6fb4f5aa0c&quot; data-hydro-click=&quot;{&amp;quot;event_type&amp;quot;:&amp;quot;code_navigation.click_on_symbol&amp;quot;,&amp;quot;payload&amp;quot;:{&amp;quot;action&amp;quot;:&amp;quot;click_on_symbol&amp;quot;,&amp;quot;repository_id&amp;quot;:491013262,&amp;quot;ref&amp;quot;:&amp;quot;7280937071d9066ba8d3babd54b2d114ab2e4704&amp;quot;,&amp;quot;language&amp;quot;:&amp;quot;Python&amp;quot;,&amp;quot;backend&amp;quot;:&amp;quot;ALEPH_PRECISE&amp;quot;,&amp;quot;code_nav_context&amp;quot;:&amp;quot;BLOB_VIEW&amp;quot;,&amp;quot;retry_backend&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;cross_repo_results_included&amp;quot;:&amp;quot;CROSS_REPO_NOT_ENABLED&amp;quot;,&amp;quot;in_repo_result_count&amp;quot;:1,&amp;quot;cross_repo_result_count&amp;quot;:0,&amp;quot;originating_url&amp;quot;:&amp;quot;https://github.com/djaszak/nlp_aug/find-definition?q=TreebankWordTokenizer&amp;amp;blob_path=nlp_aug%2Futilities%2Faugment_utils.py&amp;amp;ref=7280937071d9066ba8d3babd54b2d114ab2e4704&amp;amp;language=Python&amp;amp;row=2&amp;amp;col=26&amp;amp;code_nav_context=BLOB_VIEW&amp;quot;,&amp;quot;user_id&amp;quot;:23051584}}&quot; class=&quot;pl-token active&quot;&gt;TreebankWordTokenizer&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;pl-v&quot;&gt;&lt;span data-hydro-click-hmac=&quot;0f363842ab2565535a6f08a61bde7684fb242c6e9448bd9bc8af4a6fb4f5aa0c&quot; data-hydro-click=&quot;{&amp;quot;event_type&amp;quot;:&amp;quot;code_navigation.click_on_symbol&amp;quot;,&amp;quot;payload&amp;quot;:{&amp;quot;action&amp;quot;:&amp;quot;click_on_symbol&amp;quot;,&amp;quot;repository_id&amp;quot;:491013262,&amp;quot;ref&amp;quot;:&amp;quot;7280937071d9066ba8d3babd54b2d114ab2e4704&amp;quot;,&amp;quot;language&amp;quot;:&amp;quot;Python&amp;quot;,&amp;quot;backend&amp;quot;:&amp;quot;ALEPH_PRECISE&amp;quot;,&amp;quot;code_nav_context&amp;quot;:&amp;quot;BLOB_VIEW&amp;quot;,&amp;quot;retry_backend&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;cross_repo_results_included&amp;quot;:&amp;quot;CROSS_REPO_NOT_ENABLED&amp;quot;,&amp;quot;in_repo_result_count&amp;quot;:1,&amp;quot;cross_repo_result_count&amp;quot;:0,&amp;quot;originating_url&amp;quot;:&amp;quot;https://github.com/djaszak/nlp_aug/find-definition?q=TreebankWordTokenizer&amp;amp;blob_path=nlp_aug%2Futilities%2Faugment_utils.py&amp;amp;ref=7280937071d9066ba8d3babd54b2d114ab2e4704&amp;amp;language=Python&amp;amp;row=2&amp;amp;col=26&amp;amp;code_nav_context=BLOB_VIEW&amp;quot;,&amp;quot;user_id&amp;quot;:23051584}}&quot; class=&quot;pl-token active&quot;&gt;TreebankWordDetokenizer&lt;/span&gt;&lt;/span&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
-          <mxGeometry x="340" y="60" width="180" height="60" as="geometry" />
+          <mxGeometry x="400" y="230" width="180" height="60" as="geometry" />
         </mxCell>
         <mxCell id="0jg4HZSSIyvqCbk5FdZA-30" value="&lt;div&gt;gensim&lt;/div&gt;&lt;div&gt;Word2Vec&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
           <mxGeometry x="40" y="860" width="120" height="60" as="geometry" />
@@ -99,6 +99,30 @@
         </mxCell>
         <mxCell id="0jg4HZSSIyvqCbk5FdZA-37" value="Insertion" style="whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
           <mxGeometry x="330" y="1090" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="0jg4HZSSIyvqCbk5FdZA-39" value="&lt;div&gt;Phrase&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="73.75" y="1240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="0jg4HZSSIyvqCbk5FdZA-42" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="0jg4HZSSIyvqCbk5FdZA-40" target="0jg4HZSSIyvqCbk5FdZA-41">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="0jg4HZSSIyvqCbk5FdZA-40" value="&lt;div&gt;class Phrase()&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;__init__(spacy.nlp)&lt;/div&gt;&lt;div&gt;transformation(str) -&amp;gt; str&lt;/div&gt;&lt;div&gt;engine(data)&lt;br&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="155" y="1340" width="190" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="0jg4HZSSIyvqCbk5FdZA-41" value="&lt;div&gt;spacy&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;nlp()" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="405" y="1360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="0jg4HZSSIyvqCbk5FdZA-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="0jg4HZSSIyvqCbk5FdZA-43" target="0jg4HZSSIyvqCbk5FdZA-40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="0jg4HZSSIyvqCbk5FdZA-43" value="&lt;div&gt;class BaseCropper&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;transformation(str) -&amp;gt; str&lt;/div&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="52.5" y="1510" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="0jg4HZSSIyvqCbk5FdZA-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.789;entryY=1.03;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="0jg4HZSSIyvqCbk5FdZA-44" target="0jg4HZSSIyvqCbk5FdZA-40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="0jg4HZSSIyvqCbk5FdZA-44" value="&lt;div&gt;class BaseRotation&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;transformation(str) -&amp;gt; str&lt;/div&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="264" y="1510" width="180" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
