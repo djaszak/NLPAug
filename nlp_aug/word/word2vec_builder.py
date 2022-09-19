@@ -7,10 +7,10 @@ class Word2VecBuilder:
     def __init__(self, data):
         self.data = data
 
-    def build(name: str):
+    def build(self, name: str):
         data = []
         t = TreebankWordTokenizer()
-        for sent in data:
+        for sent in self.data:
             new_sent = []
             for word in t.tokenize(sent):
                 new_word = word.lower()

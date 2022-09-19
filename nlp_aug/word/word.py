@@ -1,6 +1,8 @@
 import random
 import spacy
 
+from colorama import Fore, Style
+
 from datasets import load_dataset
 
 from gensim.models import Word2Vec
@@ -95,7 +97,7 @@ class WordReplIns:
             if self.replacement_rule(token):
                 replacement = self.candidate_selection(token)
                 replacement = replacement.replace("_", " ")
-                new_doc.append(replacement)
+                new_doc.append(Fore.RED + replacement + Style.RESET_ALL)
             else:
                 new_doc.append(token.text)
 
@@ -130,14 +132,14 @@ class WordReplIns:
                 new_doc.append(token.text)
 
         for insert in insertion_list:
-            new_doc.insert(random.randint(0, len(new_doc)), insert)
+            new_doc.insert(random.randint(0, len(new_doc)), Fore.RED + insert + Style.RESET_ALL)
 
         d = TreebankWordDetokenizer()
         data = d.detokenize(new_doc)
         return data
 
 
-class BaseReplacer(WordReplIns):
+class BaseReplIns(WordReplIns):
     def replacement_rule(
         self, token: spacy.tokens.token.Token, replacement_prob: float = 0.5
     ) -> bool:
@@ -149,7 +151,7 @@ class BaseReplacer(WordReplIns):
         return False
 
 
-class BaseSynonymReplacer(BaseReplacer):
+class BaseSynonymReplIns(BaseReplIns):
     def candidate_selection(self, token: spacy.tokens.token.Token) -> str:
         synonyms = []
 
@@ -162,14 +164,15 @@ class BaseSynonymReplacer(BaseReplacer):
             try:
                 synonyms.remove(token.lemma_)
             except ValueError:
-                print("Lemma: ", token.lemma_, " not found in ", synonyms)
+                pass
+                # print("Lemma: ", token.lemma_, " not found in ", synonyms)
         try:
             return random.choice(list(set(synonyms)))
         except IndexError:
             return token.text
 
 
-class BaseEmbeddingReplacer(BaseReplacer):
+class BaseEmbeddingReplIns(BaseReplIns):
     def __init__(self, thesaurus=None, word2vec: Word2Vec = None):
         super().__init__(thesaurus)
         self.word2vec = word2vec
@@ -184,15 +187,15 @@ class BaseEmbeddingReplacer(BaseReplacer):
         
         return token.text
 
-model = Word2Vec.load("word2vec.model")
-replacer = BaseEmbeddingReplacer(word2vec=model)
+# model = Word2Vec.load("word2vec.model")
+# replacer = BaseEmbeddingReplIns(word2vec=model)
 
 
-imdb_dataset = load_dataset("imdb", split="train").select(range(1))
-cr_train = imdb_dataset.map(
-    replacer.insert_engine,
-    num_proc=4,
-    fn_kwargs={'augmented_feature': 'text'}
-)
+# imdb_dataset = load_dataset("imdb", split="train").select(range(1))
+# cr_train = imdb_dataset.map(
+#     replacer.insert_engine,
+#     num_proc=4,
+#     fn_kwargs={'augmented_feature': 'text'}
+# )
 
-print(cr_train["text"])
+# print(cr_train["text"])
