@@ -37,10 +37,12 @@ KEYBOARD_REPLACEMENTS = {
 
 
 class Character:
-    def __init__(self):
-        path = Path(__file__).parents[0] / "data" / "missp_data.json"
-        with path.open() as f:
-            self.missp = json.load(f)
+    def __init__(self, misspellings=None, keyboard_replacements=KEYBOARD_REPLACEMENTS):
+        if not misspellings:
+            path = Path(__file__).parents[0] / "data" / "missp_data.json"
+            with path.open() as f:
+                self.missp = json.load(f)
+        self.keyboard_replacements = keyboard_replacements
 
     def noise_induction(self, text):
         # Won't do this now.
@@ -94,8 +96,7 @@ class Character:
                 new_words.append(word)
         return new_words
 
-    @staticmethod
-    def keyboard_replacer(text: list) -> list:
+    def keyboard_replacer(self, text: list) -> list:
         new_words = []
         for word in text:
             # Interesting behavior, 1-letter words are always changed.
@@ -104,7 +105,7 @@ class Character:
             rand_index = random.randint(0, len(word) - 1)
             try:
                 new_word[rand_index] = random.choice(
-                    KEYBOARD_REPLACEMENTS[word[rand_index].lower()]
+                    self.keyboard_replacements[word[rand_index].lower()]
                 )
             except KeyError:
                 pass

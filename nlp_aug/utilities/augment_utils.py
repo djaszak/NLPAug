@@ -1,5 +1,7 @@
 import random
 
+from colorama import Fore, Style
+
 from nltk.tokenize import TreebankWordTokenizer, TreebankWordDetokenizer
 
 
@@ -22,7 +24,7 @@ def augment_data(data, augmenter, method: str, augment_probability: float = 1):
             if token.isalpha() and augment_probability >= random.random():
                 augmented_token = getattr(augmenter, method)([token])
                 try:
-                    new_line.append(augmented_token[0])
+                    new_line.append(Fore.RED + augmented_token[0] + Style.RESET_ALL)
                 except IndexError:
                     pass
             else:
