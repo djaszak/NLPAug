@@ -188,9 +188,9 @@ model = Word2Vec.load("word2vec.model")
 replacer = BaseEmbeddingReplacer(word2vec=model)
 
 
-imdb_dataset = load_dataset("imdb", split="train").select(range(10))
+imdb_dataset = load_dataset("imdb", split="train").select(range(1))
 cr_train = imdb_dataset.map(
-    replacer.engine,
+    replacer.insert_engine,
     num_proc=4,
     fn_kwargs={'augmented_feature': 'text'}
 )
