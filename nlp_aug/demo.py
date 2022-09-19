@@ -39,14 +39,22 @@ for mode in modes:
 # synonym_inserted_text = BaseSynonymReplIns().insert_engine(imdb_text)
 
 # ## Build a Word2Vec Model to use WordEmbeddings
-# Word2VecBuilder(imdb_dataset['text']).build('demo_word2vec')
+# Word2VecBuilder(imdb_dataset["text"]).build("demo_word2vec")
 
-# model = Word2Vec.load('word2vec.model')
+# model = Word2Vec.load("word2vec.model")
 
 # embedding_replaced_text = BaseEmbeddingReplIns(word2vec=model).replace_engine(imdb_text)
 # embedding_inserted_text = BaseEmbeddingReplIns(word2vec=model).insert_engine(imdb_text)
 
-# print(f"{Fore.BLUE}Using augmentation method synonym replacement:{Style.RESET_ALL} {synonym_replaced_text}")
-# print(f"{Fore.BLUE}Using augmentation method synonym insertion:{Style.RESET_ALL} {synonym_inserted_text}")
-# print(f"{Fore.BLUE}Using augmentation method embedding replacement:{Style.RESET_ALL} {embedding_replaced_text}")
-# print(f"{Fore.BLUE}Using augmentation method :{Style.RESET_ALL} {embedding_inserted_text}")
+# print(
+#     f"{Fore.BLUE}Using augmentation method synonym replacement:{Style.RESET_ALL} {synonym_replaced_text}"
+# )
+# print(
+#     f"{Fore.BLUE}Using augmentation method synonym insertion:{Style.RESET_ALL} {synonym_inserted_text}"
+# )
+# print(
+#     f"{Fore.BLUE}Using augmentation method embedding Ich freue mich schon jetzt auf die Dusche @Manuel ich denke du kannst dich für morgen austragen 💁‍♂️😘 (sorry)replacement:{Style.RESET_ALL} {embedding_replaced_text}"
+# )
+# print(
+#     f"{Fore.BLUE}Using augmentation method :{Style.RESET_ALL} {embedding_inserted_text}"
+# )
