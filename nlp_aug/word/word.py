@@ -75,7 +75,7 @@ class WordReplIns:
             text += tok[buffer_start:].text
         return text
 
-    def replace_engine(self, data: str, augmented_feature: str) -> str:
+    def replace_engine(self, data: str) -> str:
         """Using `replacement_rule()` and `synonym_selection()` a string is augmented
 
         Args:
@@ -86,7 +86,7 @@ class WordReplIns:
         Returns:
             str: The augmented string.
         """
-        data_feature = data[augmented_feature]
+        data_feature = data
         doc = self.nlp(data_feature)
 
         new_doc = []
@@ -100,10 +100,10 @@ class WordReplIns:
                 new_doc.append(token.text)
 
         d = TreebankWordDetokenizer()
-        data[augmented_feature] = d.detokenize(new_doc)
+        data = d.detokenize(new_doc)
         return data
 
-    def insert_engine(self, data: str, augmented_feature: str) -> str:
+    def insert_engine(self, data: str) -> str:
         """Using `replacement_rule()` and `synonym_selection()` a string is augmented
 
         Args:
@@ -114,7 +114,7 @@ class WordReplIns:
         Returns:
             str: The augmented string.
         """
-        data_feature = data[augmented_feature]
+        data_feature = data
         doc = self.nlp(data_feature)
 
         new_doc = []
@@ -133,7 +133,7 @@ class WordReplIns:
             new_doc.insert(random.randint(0, len(new_doc)), insert)
 
         d = TreebankWordDetokenizer()
-        data[augmented_feature] = d.detokenize(new_doc)
+        data = d.detokenize(new_doc)
         return data
 
 

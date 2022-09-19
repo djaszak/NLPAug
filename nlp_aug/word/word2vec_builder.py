@@ -1,5 +1,10 @@
+import string
+
+from gensim.models import Word2Vec
+from nltk.tokenize import TreebankWordTokenizer
+
 class Word2VecBuilder:
-    def __init__(data):
+    def __init__(self, data):
         self.data = data
 
     def build(name: str):
