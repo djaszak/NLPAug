@@ -4,9 +4,10 @@ from datasets import load_dataset
 from gensim.models import Word2Vec
 
 from nlp_aug.character.character import Character
+from nlp_aug.phrase.phrase import BaseCropper, BaseRotation
+from nlp_aug.utilities.augment_utils import augment_data
 from nlp_aug.word.word import BaseSynonymReplIns, BaseEmbeddingReplIns
 from nlp_aug.word.word2vec_builder import Word2VecBuilder
-from nlp_aug.utilities.augment_utils import augment_data
 
 ## At first we get a real life dataset, which I load from huggingface
 ## For this demo, one sample is more than enough
@@ -53,8 +54,20 @@ for mode in modes:
 #     f"{Fore.BLUE}Using augmentation method synonym insertion:{Style.RESET_ALL} {synonym_inserted_text}"
 # )
 # print(
-#     f"{Fore.BLUE}Using augmentation method embedding Ich freue mich schon jetzt auf die Dusche @Manuel ich denke du kannst dich für morgen austragen 💁‍♂️😘 (sorry)replacement:{Style.RESET_ALL} {embedding_replaced_text}"
+#     f"{Fore.BLUE}Using augmentation method embedding replacement:{Style.RESET_ALL} {embedding_replaced_text}"
 # )
 # print(
 #     f"{Fore.BLUE}Using augmentation method :{Style.RESET_ALL} {embedding_inserted_text}"
 # )
+
+
+## Now we use the word level augmenters to do some synonym and embedding replacements
+cropped_text = BaseCropper().engine(imdb_text)
+rotated_text = BaseRotation().engine(imdb_text)
+
+print(
+    f"{Fore.BLUE}Using cropping method:{Style.RESET_ALL} {cropped_text}"
+)
+print(
+    f"{Fore.BLUE}Using roation method:{Style.RESET_ALL} {rotated_text}"
+)
