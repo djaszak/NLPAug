@@ -4,7 +4,7 @@ from datasets import concatenate_datasets
 
 from nlp_aug.character.character import augment_huggingface_data
 from nlp_aug.trainer.training_utils import tensorflow_training_wrapper
-from nlp_aug.trainer.data_loader import load_dataset
+from nlp_aug.trainer.data_loader import load_my_dataset
 
 
 def get_augmentation_fn_kwargs(mode: str):
@@ -12,7 +12,7 @@ def get_augmentation_fn_kwargs(mode: str):
 
 
 def basic_character_pipeline(dataset: str):
-    train_set, test_set, eval_set, num_labels = load_dataset(dataset)
+    train_set, test_set, eval_set, num_labels = load_my_dataset(dataset)
 
     # Augmented test data
     cr_train = train_set.map(
@@ -115,7 +115,7 @@ def basic_character_pipeline(dataset: str):
 
 
 def promising_character_techniques_pipeline(dataset: str):
-    train_set, test_set, eval_set, num_labels = load_dataset(dataset)
+    train_set, test_set, eval_set, num_labels = load_my_dataset(dataset)
 
     def _augment_good_techniques(data, augment_probability):
         mr_train = data.map(
