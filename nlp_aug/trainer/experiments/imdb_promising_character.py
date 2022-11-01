@@ -1,0 +1,4 @@
+from nlp_aug import constants
+from nlp_aug.trainer.training_pipelines import promising_character_techniques_pipeline
+
+promising_character_techniques_pipeline(constants.IMDB)
