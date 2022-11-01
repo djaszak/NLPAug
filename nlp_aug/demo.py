@@ -65,9 +65,5 @@ for mode in modes:
 cropped_text = BaseCropper().engine(imdb_text)
 rotated_text = BaseRotation().engine(imdb_text)
 
-print(
-    f"{Fore.BLUE}Using cropping method:{Style.RESET_ALL} {cropped_text}"
-)
-print(
-    f"{Fore.BLUE}Using roation method:{Style.RESET_ALL} {rotated_text}"
-)
+print(f"{Fore.BLUE}Using cropping method:{Style.RESET_ALL} {cropped_text}")
+print(f"{Fore.BLUE}Using roation method:{Style.RESET_ALL} {rotated_text}")

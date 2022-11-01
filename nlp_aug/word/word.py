@@ -97,7 +97,7 @@ class WordReplIns:
             if self.replacement_rule(token):
                 replacement = self.candidate_selection(token)
                 replacement = replacement.replace("_", " ")
-                new_doc.append(Fore.RED + replacement + Style.RESET_ALL)
+                new_doc.append(replacement)
             else:
                 new_doc.append(token.text)
 
@@ -132,7 +132,7 @@ class WordReplIns:
                 new_doc.append(token.text)
 
         for insert in insertion_list:
-            new_doc.insert(random.randint(0, len(new_doc)), Fore.RED + insert + Style.RESET_ALL)
+            new_doc.insert(random.randint(0, len(new_doc)), insert)
 
         d = TreebankWordDetokenizer()
         data = d.detokenize(new_doc)
@@ -184,8 +184,8 @@ class BaseEmbeddingReplIns(BaseReplIns):
                 return self.word2vec.wv.most_similar(token.text)[0][0]
             except Exception as e:
                 return token.text
-        
         return token.text
+
 
 # model = Word2Vec.load("word2vec.model")
 # replacer = BaseEmbeddingReplIns(word2vec=model)

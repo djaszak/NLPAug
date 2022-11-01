@@ -150,7 +150,7 @@ class Character:
 augmenter = Character()
 
 
-def augment_hugginface_data(
+def augment_huggingface_data(
     data, augmented_feature: str, mode: str, augment_probability: float = 1
 ):
     data[augmented_feature] = augment_data(

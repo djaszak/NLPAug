@@ -27,8 +27,10 @@ class PhraseAugmenter:
         """Implement the transformation that should be done to the sentence."""
         return sent
 
-
-    def engine(self, data: str,) -> str:
+    def engine(
+        self,
+        data: str,
+    ) -> str:
         """Using `replacement_rule()` and `synonym_selection()` a string is augmented
 
         Args:
@@ -48,12 +50,13 @@ class PhraseAugmenter:
         for sent in sents:
             new_doc.append(self.transformation(sent))
 
-        data = '. '.join(new_doc)
+        data = ". ".join(new_doc)
 
         return data
 
+
 class BaseCropper(PhraseAugmenter):
-    def transformation(self, sent: str, dependency_focus: str = 'nsubj') -> str:
+    def transformation(self, sent: str, dependency_focus: str = "nsubj") -> str:
         sent = super().transformation(sent)
 
         subj_list = [token for token in sent if token.dep_ == dependency_focus]
@@ -67,17 +70,17 @@ class BaseCropper(PhraseAugmenter):
                 head_dict[subj].append(head)
                 head = head.head
             head_dict[subj] = list(set(head_dict[subj]))
-        
+
         new_sent = []
-        for key, val in head_dict.items(): 
-            new_sent.append([key, val]) 
+        for key, val in head_dict.items():
+            new_sent.append([key, val])
 
         real_new_sent = []
         for part in new_sent:
             real_new_sent.append(part[0].text)
             for smaller_part in part[1]:
                 real_new_sent.append(smaller_part.text)
-            real_new_sent.append(',')
+            real_new_sent.append(",")
 
         real_new_sent[0] = real_new_sent[0].capitalize()
         real_new_sent.pop(-1)
@@ -86,8 +89,9 @@ class BaseCropper(PhraseAugmenter):
 
         return sent
 
+
 class BaseRotation(PhraseAugmenter):
-    def transformation(self, sent: str, dependency_focus: str = 'nsubj') -> str:
+    def transformation(self, sent: str, dependency_focus: str = "nsubj") -> str:
         sent = super().transformation(sent)
 
         root = [token for token in sent if token.dep_ == dependency_focus][0].text
@@ -113,8 +117,9 @@ class BaseRotation(PhraseAugmenter):
 
         return sent
 
+
 imdb_dataset = load_dataset("imdb", split="train").select(range(1))
 cropper = BaseRotation()
 for data in imdb_dataset:
-    print(data['text'])
-    print(cropper.engine(data['text']))
+    print(data["text"])
+    print(cropper.engine(data["text"]))

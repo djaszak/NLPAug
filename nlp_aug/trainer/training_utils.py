@@ -58,20 +58,26 @@ def save_hist_model(history, model, evaluation, name):
         hist_df.to_json(f)
     eval_json_file = f"{name}_eval_accuracy.json"
     with open(eval_json_file, mode="w") as f:
-        {'accuracy': evaluation[1]}.to_json()
-        hist_df.to_json(f)        
+        {"accuracy": evaluation[1]}.to_json()
+        hist_df.to_json(f)
     model.save_pretrained(f"/tmp/{name}_custom_model")
 
 
 def tensorflow_training_wrapper(
-    train_dataset: Dataset, eval_dataset: Dataset, test_dataset: Dataset, saving_name: str, num_labels: int = 2, epochs: int = 3
+    train_dataset: Dataset,
+    eval_dataset: Dataset,
+    test_dataset: Dataset,
+    saving_name: str,
+    num_labels: int = 2,
+    epochs: int = 10,
 ) -> TFAutoModelForSequenceClassification:
     false_shuffle = {
         "columns": ["attention_mask", "input_ids", "token_type_ids"],
         "label_cols": ["labels"],
         "shuffle": False,
         "collate_fn": data_collator,
-        "batch_size": 8,}
+        "batch_size": 8,
+    }
     tf_eval_dataset = eval_dataset.to_tf_dataset(**false_shuffle)
 
     tf_train_dataset = train_dataset.to_tf_dataset(
@@ -84,6 +90,10 @@ def tensorflow_training_wrapper(
 
     tf_test_dataset = test_dataset.to_tf_dataset(**false_shuffle)
 
+    early_stopping_callback = tf.keras.callbacks.EarlyStopping(
+        monitor="loss", patience=3
+    )
+
     model = TFAutoModelForSequenceClassification.from_pretrained(
         "bert-base-cased", num_labels=num_labels
     )
@@ -93,14 +103,19 @@ def tensorflow_training_wrapper(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         metrics=[
             tf.metrics.SparseCategoricalAccuracy(),
-            # tf.metrics.Accuracy(),
-            # tf.metrics.Precision(),
-            # tf.metrics.Recall(),
+            tf.metrics.Accuracy(),
+            tf.metrics.Precision(),
+            tf.metrics.Recall(),
         ],
     )
-    history = model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=epochs)
+    history = model.fit(
+        tf_train_dataset,
+        validation_data=tf_eval_dataset,
+        epochs=epochs,
+        callbacks=[early_stopping_callback],
+    )
     evaluation = model.evaluate(tf_test_dataset)
-    
+
     save_hist_model(history, model, evaluation, saving_name)
 
     return history, model, evaluation
