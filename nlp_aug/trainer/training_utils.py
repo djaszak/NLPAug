@@ -53,10 +53,6 @@ def save_hist_model(history, model, evaluation, name):
     hist_json_file = f"{name}_history.json"
     with open(hist_json_file, mode="w") as f:
         hist_df.to_json(f)
-    eval_json_file = f"{name}_eval_accuracy.json"
-    with open(eval_json_file, mode="w") as f:
-        {"accuracy": evaluation[1]}.to_json()
-        hist_df.to_json(f)
     model.save_pretrained(f"/tmp/{name}_custom_model")
 
 
