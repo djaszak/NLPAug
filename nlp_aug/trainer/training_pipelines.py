@@ -8,7 +8,7 @@ from nlp_aug.trainer.data_loader import load_my_dataset
 
 
 def get_augmentation_fn_kwargs(mode: str):
-    return {"augmented_feature": "text", "mode": mode, "augment_probability": 1}
+    return {"augmented_feature": "text", "mode": mode, "augment_probability": 0.75}
 
 
 def basic_character_pipeline(dataset: str):
@@ -58,6 +58,8 @@ def basic_character_pipeline(dataset: str):
     inserter_concat_set = concatenate_datasets([train_set, inserter_train])
     remover_concat_set = concatenate_datasets([train_set, remover_train])
     misspell_concat_set = concatenate_datasets([train_set, misspell_train])
+
+    print('All data augmented')
 
     tensorflow_training_wrapper(train_set, eval_set, test_set, dataset, num_labels)
 
