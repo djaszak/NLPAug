@@ -62,7 +62,7 @@ def tensorflow_training_wrapper(
     test_dataset: Dataset,
     saving_name: str,
     num_labels: int = 2,
-    epochs: int = 10,
+    epochs: int = 5,
 ) -> TFAutoModelForSequenceClassification:
     false_shuffle = {
         "columns": ["attention_mask", "input_ids", "token_type_ids"],
