@@ -12,14 +12,21 @@ import datetime
 import sys
 import time
 
-def run_character_augmentation_experiment(dataset:str, mode: str = '', augment_probability: float = 0.75, epochs:int = 5, concat: bool = False):
-    sys.stdout.write('Experiment starts with: ')
-    sys.stdout.write(f'DATASET: {dataset}')
-    sys.stdout.write(f'MODE: {mode}')
-    sys.stdout.write(f'AUGMENT_PROBABILITY: {augment_probability}')
-    sys.stdout.write(f'EPOCHS: {epochs}')
-    sys.stdout.write(f'CONCAT: {concat}')
-    sys.stdout.write(f'on time at greenwich meridian: {datetime.datetime.now()}')
+
+def run_character_augmentation_experiment(
+    dataset: str,
+    mode: str = "",
+    augment_probability: float = 0.75,
+    epochs: int = 5,
+    concat: bool = False,
+):
+    sys.stdout.write("Experiment starts with: ")
+    sys.stdout.write(f"DATASET: {dataset}")
+    sys.stdout.write(f"MODE: {mode}")
+    sys.stdout.write(f"AUGMENT_PROBABILITY: {augment_probability}")
+    sys.stdout.write(f"EPOCHS: {epochs}")
+    sys.stdout.write(f"CONCAT: {concat}")
+    sys.stdout.write(f"on time at greenwich meridian: {datetime.datetime.now()}")
 
     time_1 = time.time()
     train_set, test_set, eval_set, num_labels = load_my_dataset(dataset)
@@ -28,36 +35,51 @@ def run_character_augmentation_experiment(dataset:str, mode: str = '', augment_p
         augmented_train = train_set.map(
             augment_huggingface_data,
             num_proc=multiprocessing.cpu_count(),
-            fn_kwargs={"augmented_feature": "text", "mode": mode, "augment_probability": augment_probability},
+            fn_kwargs={
+                "augmented_feature": "text",
+                "mode": mode,
+                "augment_probability": augment_probability,
+            },
         )
     if concat:
         train_set = concatenate_datasets([train_set, augmented_train])
-    
+
     train_set = augmented_train if augmented_train else train_set
 
     tensorflow_training_wrapper(
         train_dataset=train_set.select(range(10)),
         eval_dataset=eval_set.select(range(10)),
         test_dataset=test_set.select(range(10)),
-        saving_name=f'{dataset}_{mode}_{concat}',
+        saving_name=f"{dataset}_{mode}_{concat}",
         num_labels=num_labels,
-        epochs=epochs
+        epochs=epochs,
     )
     time_2 = time.time()
-    sys.stdout.write(f'Augmentation took about {round((time_2-time_1)/60)} minutes')
+    sys.stdout.write(f"Augmentation took about {round((time_2-time_1)/60)} minutes")
 
 
-parser = argparse.ArgumentParser(description='Run character augmentation experiments from the command line')
+parser = argparse.ArgumentParser(
+    description="Run character augmentation experiments from the command line"
+)
 parser.add_argument(
     "--dataset",
     type=str,
     required=True,
-    choices=[constants.AG_NEWS, constants.TREC6, constants.SUBJ, constants.ROTTEN, constants.IMDB, constants.SST2, constants.COLA],
-    help="This is the dataset, currently 7 widely known ones are available.")
+    choices=[
+        constants.AG_NEWS,
+        constants.TREC6,
+        constants.SUBJ,
+        constants.ROTTEN,
+        constants.IMDB,
+        constants.SST2,
+        constants.COLA,
+    ],
+    help="This is the dataset, currently 7 widely known ones are available.",
+)
 parser.add_argument(
     "--mode",
     type=str,
-    default='',
+    default="",
     choices=[
         "complete_randomizer",
         "keyboard_replacer",
@@ -65,23 +87,27 @@ parser.add_argument(
         "random_switcher",
         "inserter",
         "remover",
-        "misspeller"
+        "misspeller",
     ],
-    help="The augmentation mode that should be used for this experiment. If none is provided, nothing is augmented")
+    help="The augmentation mode that should be used for this experiment. If none is provided, nothing is augmented",
+)
 parser.add_argument(
     "--augment_probability",
     type=float,
-    help="The probability with which a token will be augmented, range between 0 and 1.")
+    help="The probability with which a token will be augmented, range between 0 and 1.",
+)
 parser.add_argument(
     "--epochs",
     type=int,
     default=5,
-    help="The number of epochs used for this experiment.")
+    help="The number of epochs used for this experiment.",
+)
 parser.add_argument(
     "--concat",
     type=bool,
     default=False,
-    help="Should the augmented mode be tested or should it be concatenated with the original dataset")
+    help="Should the augmented mode be tested or should it be concatenated with the original dataset",
+)
 
 args = parser.parse_args()
 
@@ -89,7 +115,7 @@ run_character_augmentation_experiment(
     dataset=args.dataset,
     mode=args.mode,
     augment_probability=args.augment_probability,
-    concat=args.concat
+    concat=args.concat,
 )
 
 # def get_augmentation_fn_kwargs(mode: str):
@@ -147,13 +173,13 @@ run_character_augmentation_experiment(
 #     print(f'Augmentation took ({(time2-time1)/60})) m')
 #     print('All data augmented')
 
-    # tensorflow_training_wrapper(train_set, eval_set, test_set, dataset, num_labels)
-    # time1 = time.time()
-    # tensorflow_training_wrapper(
-    #     cr_train, eval_set, test_set, dataset + f"{dataset}_cr", num_labels
-    # )
-    # time2 = time.time()
-    # print(f'Normal training took ({(time2-time1)/60})) m')
+# tensorflow_training_wrapper(train_set, eval_set, test_set, dataset, num_labels)
+# time1 = time.time()
+# tensorflow_training_wrapper(
+#     cr_train, eval_set, test_set, dataset + f"{dataset}_cr", num_labels
+# )
+# time2 = time.time()
+# print(f'Normal training took ({(time2-time1)/60})) m')
 
 #     time1 = time.time()
 #     tensorflow_training_wrapper(

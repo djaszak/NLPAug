@@ -88,18 +88,18 @@ def tensorflow_training_wrapper(
     )
 
     model = TFAutoModelForSequenceClassification.from_pretrained(
-            "bert-base-cased", num_labels=num_labels
-        )
+        "bert-base-cased", num_labels=num_labels
+    )
 
     model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=5e-5),
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-            metrics=[
-                tf.keras.metrics.SparseCategoricalAccuracy(),
-                # tf.keras.metrics.Precision(),
-                # tf.keras.metrics.Recall(),
-            ],
-        )
+        optimizer=tf.keras.optimizers.Adam(learning_rate=5e-5),
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        metrics=[
+            tf.keras.metrics.SparseCategoricalAccuracy(),
+            # tf.keras.metrics.Precision(),
+            # tf.keras.metrics.Recall(),
+        ],
+    )
 
     # I just do not understand how keras metrics work with the size of the labels.
     # if num_labels == 2:
@@ -125,7 +125,6 @@ def tensorflow_training_wrapper(
     #         ],
     #     )
 
-        
     history = model.fit(
         tf_train_dataset,
         validation_data=tf_eval_dataset,
