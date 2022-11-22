@@ -13,6 +13,7 @@ from transformers import (
     TrainingArguments,
     TFAutoModelForSequenceClassification,
 )
+from pathlib import Path
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 
 TRAIN = "train"
@@ -50,8 +51,8 @@ def compute_metrics(p):
 def save_hist_model(history, model, evaluation, name):
     hist_df = pd.DataFrame(history.history)
     hist_df.insert(0, "evaluation_accuracy", evaluation[1])
-    hist_json_file = f"{name}_history.json"
-    with open(hist_json_file, mode="w") as f:
+    correct_path = (Path(__file__).parent / 'output' / f"{name}_history.json").resolve()
+    with open(correct_path, mode="w") as f:
         hist_df.to_json(f)
     model.save_pretrained(f"/tmp/{name}_custom_model")
 

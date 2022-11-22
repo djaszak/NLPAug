@@ -20,13 +20,13 @@ def run_character_augmentation_experiment(
     epochs: int = 5,
     concat: bool = False,
 ):
-    sys.stdout.write("Experiment starts with: ")
-    sys.stdout.write(f"DATASET: {dataset}")
-    sys.stdout.write(f"MODE: {mode}")
-    sys.stdout.write(f"AUGMENT_PROBABILITY: {augment_probability}")
-    sys.stdout.write(f"EPOCHS: {epochs}")
-    sys.stdout.write(f"CONCAT: {concat}")
-    sys.stdout.write(f"on time at greenwich meridian: {datetime.datetime.now()}")
+    sys.stdout.write("Experiment starts with: \n")
+    sys.stdout.write(f"DATASET: {dataset}\n")
+    sys.stdout.write(f"MODE: {mode}\n")
+    sys.stdout.write(f"AUGMENT_PROBABILITY: {augment_probability}\n")
+    sys.stdout.write(f"EPOCHS: {epochs}\n")
+    sys.stdout.write(f"CONCAT: {concat}\n")
+    sys.stdout.write(f"on time at greenwich meridian: {datetime.datetime.now()}\n")
 
     time_1 = time.time()
     train_set, test_set, eval_set, num_labels = load_my_dataset(dataset)
@@ -47,15 +47,15 @@ def run_character_augmentation_experiment(
     train_set = augmented_train if augmented_train else train_set
 
     tensorflow_training_wrapper(
-        train_dataset=train_set.select(range(10)),
-        eval_dataset=eval_set.select(range(10)),
-        test_dataset=test_set.select(range(10)),
-        saving_name=f"{dataset}_{mode}_{concat}",
+        train_dataset=train_set,
+        eval_dataset=eval_set,
+        test_dataset=test_set,
+        saving_name=f"{dataset}_{mode}_{augment_probability}_{concat}",
         num_labels=num_labels,
         epochs=epochs,
     )
     time_2 = time.time()
-    sys.stdout.write(f"Augmentation took about {round((time_2-time_1)/60)} minutes")
+    sys.stdout.write(f"Augmentation took about {round((time_2-time_1)/60)} minutes\n")
 
 
 parser = argparse.ArgumentParser(
@@ -115,6 +115,7 @@ run_character_augmentation_experiment(
     dataset=args.dataset,
     mode=args.mode,
     augment_probability=args.augment_probability,
+    epochs=args.epochs,
     concat=args.concat,
 )
 
