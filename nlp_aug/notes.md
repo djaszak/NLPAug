@@ -29,3 +29,11 @@
 * Tokenization -> Word Embeddings
 * Ordentliches Einsetzen der neuen Woerter
 * Anpassungen an real life data
+
+### 25/11/2022
+* Visualisierung ueber Balkendiagramme
+  * Standarddatensatz als Referenzwert
+  * Visualisieren welche Augmentierung wieviel +-
+  * Aufsummieren ueber Datensaetze
+* Den Datensatz, wo es anscheinend am besten funktioniert noch genauer augmentieren
+  * 10, 20, 30... % und auch die Konkatenierung anpassen
