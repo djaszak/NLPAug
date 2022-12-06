@@ -1,10 +1,13 @@
 import json
 import os
-import pprint
+import math
 
 import matplotlib.pyplot as plt
+
 from pathlib import Path
 from nlp_aug import constants
+import seaborn as sns
+import pandas as pd
 
 
 def sort_dict_by_value(dict_to_sort):
@@ -56,59 +59,75 @@ for elem in evaluation_accs:
     if elem.startswith(constants.COLA):
         cola_accs[elem] = evaluation_accs[elem]
 
-ag_accs = sort_dict_by_value(ag_accs)
-trec6_accs = sort_dict_by_value(trec6_accs)
-subj_accs = sort_dict_by_value(subj_accs)
-rotten_accs = sort_dict_by_value(rotten_accs)
-imdb_accs = sort_dict_by_value(imdb_accs)
-sst2_accs = sort_dict_by_value(sst2_accs)
-cola_accs = sort_dict_by_value(cola_accs)
-
-pprint.pprint(ag_accs, sort_dicts=False)
-pprint.pprint(trec6_accs, sort_dicts=False)
-pprint.pprint(subj_accs, sort_dicts=False)
-pprint.pprint(rotten_accs, sort_dicts=False)
-pprint.pprint(imdb_accs, sort_dicts=False)
-pprint.pprint(sst2_accs, sort_dicts=False)
-pprint.pprint(cola_accs, sort_dicts=False)
-
-# def plot_things(title, plt):
-#     plt.title(title)
-#     plt.legend()
-#     plt.xlabel("Epoch")
-#     plt.ylabel("Accuracy")
+ag_accs = dict(sorted((ag_accs.items())))
+trec6_accs = dict(sorted((trec6_accs.items())))
+subj_accs = dict(sorted((subj_accs.items())))
+rotten_accs = dict(sorted((rotten_accs.items())))
+imdb_accs = dict(sorted((imdb_accs.items())))
+sst2_accs = dict(sorted((sst2_accs.items())))
+cola_accs = dict(sorted((cola_accs.items())))
 
 
-# # 5 subplots. 2 on top for accuracy and val_accuracy with only augmented, 2 below with augmented + imdb. imdb on top for itself.
-# x = [1, 2, 3]
-# plt.subplot(2, 3, 1)
-# plt.plot(x, accs["imdb_history.json"], label="imdb_history_acc")
-# plt.plot(x, accs["imdb_history.json"], label="imdb_history_val_acc")
-# plot_things("IMDB accuracy and validation accuracy", plt)
+def round_down(n, decimals=0):
+    multiplier = 10**decimals
+    return math.floor(n * multiplier) / multiplier
 
-# plt.subplot(2, 3, 2)
 
-# for history in accs:
-#     if "imdb" in history and history != "imdb_history.json":
-#         plt.plot(x, accs[history], label=history)
-# plot_things("Concatenated datasets accuracies", plt)
+def bar_plot_dataset_overall_augmentation(dataset: str, acc_dict: dict) -> None:
+    value_list = []
+    label_list = []
+    diff_list = []
+    colors = []
+    saving_file_name = dataset + "_0.5_concat"
+    base_value = 0
+    suffix = '_0.5_True_history.json'
 
-# plt.subplot(2, 3, 3)
-# for history in accs:
-#     if "imdb" not in history:
-#         plt.plot(x, accs[history], label=history)
-# plot_things("Only augmented dataset accuracies", plt)
+    # Format data out of dict into plottable format
+    for key, value in acc_dict.items():
+        if "0.0" in key:
+            value_list.append(value)
+            base_value = value
+            label_list.append("Base")
+            colors.append("b")
 
-# plt.subplot(2, 3, 4)
-# for history in val_accs:
-#     if "imdb" in history and history != "imdb_history.json":
-#         plt.plot(x, val_accs[history], label=history)
-# plot_things("Concatenated datasets validation accuracies", plt)
+    for key, value in acc_dict.items():
+        if not "0.0" in key and not "size" in key and not "num_labels" in key:
+            value_list.append(value)
+            label_list.append(key[len(dataset) + 1 :][: -len(suffix)])
+            diff_list.append(base_value - value)
+            colors.append("g" if value > base_value else "red")
 
-# plt.subplot(2, 3, 5)
-# for history in val_accs:
-#     if "imdb" not in history:
-#         plt.plot(x, val_accs[history], label=history)
-# plot_things("Only augmented dataset validation accuracies", plt)
+    # Format lists into dataframe
+    data = {"Augmentation method": label_list, "Accuracy": value_list}
+    df = pd.DataFrame(data, columns=["Augmentation method", "Accuracy"])
 
-# plt.show()
+    # Plot
+    plots = sns.barplot(x="Augmentation method", y="Accuracy", data=df)
+    # Annotation bars
+    for bar in plots.patches:
+        plots.annotate(
+            f'{format(bar.get_height(), ".4f")} ({round(plots.patches[0].get_height() - bar.get_height(), 4) * -1})',
+            (bar.get_x() + bar.get_width() / 2, bar.get_height()),
+            ha="center",
+            va="center",
+            size=15,
+            xytext=(0, 8),
+            textcoords="offset points",
+        )
+    # Actual plot + misc stuff
+    plt.xlabel("Augmentation method")
+    plt.ylabel("Accuracy")
+    plt.title(dataset)
+    plt.bar(label_list, value_list, color=colors)
+    plt.xticks(rotation=45, horizontalalignment="right")
+    plt.ylim(round_down(min(value_list), 1), 1)
+    plt.show()
+    # plt.savefig((Path(__file__).parent / "graphs" / saving_file_name).resolve())
+
+# suffix = '_50_concat'
+suffix = ''
+bar_plot_dataset_overall_augmentation("trec6"+ suffix, trec6_accs)
+# bar_plot_dataset_overall_augmentation("subj"+ suffix, subj_accs)
+# bar_plot_dataset_overall_augmentation("rotten"+ suffix, rotten_accs)
+# bar_plot_dataset_overall_augmentation("sst2"+ suffix, sst2_accs)
+# bar_plot_dataset_overall_augmentation("cola"+ suffix, cola_accs)
