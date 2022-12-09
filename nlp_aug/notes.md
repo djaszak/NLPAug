@@ -37,3 +37,6 @@
   * Aufsummieren ueber Datensaetze
 * Den Datensatz, wo es anscheinend am besten funktioniert noch genauer augmentieren
   * 10, 20, 30... % und auch die Konkatenierung anpassen
+
+### 09/12/2022
+* Related works -> Tabelle welche bereits durchgefuehrte Experimente zusammenfasst und dann in Relation zu eigenen Erkentnissen
