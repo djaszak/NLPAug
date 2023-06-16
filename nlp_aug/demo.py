@@ -35,30 +35,30 @@ for mode in modes:
     augmented_data_string = augment_data(imdb_text, character_augmenter, mode, 0.5)
     print(f"{Fore.BLUE}Using mode {mode}:{Style.RESET_ALL} {augmented_data_string}")
 
-## Now we use the word level augmenters to do some synonym and embedding replacements
-# synonym_replaced_text = BaseSynonymReplIns().replace_engine(imdb_text)
-# synonym_inserted_text = BaseSynonymReplIns().insert_engine(imdb_text)
+# Now we use the word level augmenters to do some synonym and embedding replacements
+synonym_replaced_text = BaseSynonymReplIns().replace_engine(imdb_text)
+synonym_inserted_text = BaseSynonymReplIns().insert_engine(imdb_text)
 
-# ## Build a Word2Vec Model to use WordEmbeddings
-# Word2VecBuilder(imdb_dataset["text"]).build("demo_word2vec")
+## Build a Word2Vec Model to use WordEmbeddings
+Word2VecBuilder(imdb_dataset["text"]).build("demo_word2vec")
 
-# model = Word2Vec.load("word2vec.model")
+model = Word2Vec.load("word2vec.model")
 
-# embedding_replaced_text = BaseEmbeddingReplIns(word2vec=model).replace_engine(imdb_text)
-# embedding_inserted_text = BaseEmbeddingReplIns(word2vec=model).insert_engine(imdb_text)
+embedding_replaced_text = BaseEmbeddingReplIns(word2vec=model).replace_engine(imdb_text)
+embedding_inserted_text = BaseEmbeddingReplIns(word2vec=model).insert_engine(imdb_text)
 
-# print(
-#     f"{Fore.BLUE}Using augmentation method synonym replacement:{Style.RESET_ALL} {synonym_replaced_text}"
-# )
-# print(
-#     f"{Fore.BLUE}Using augmentation method synonym insertion:{Style.RESET_ALL} {synonym_inserted_text}"
-# )
-# print(
-#     f"{Fore.BLUE}Using augmentation method embedding replacement:{Style.RESET_ALL} {embedding_replaced_text}"
-# )
-# print(
-#     f"{Fore.BLUE}Using augmentation method :{Style.RESET_ALL} {embedding_inserted_text}"
-# )
+print(
+    f"{Fore.BLUE}Using augmentation method synonym replacement:{Style.RESET_ALL} {synonym_replaced_text}"
+)
+print(
+    f"{Fore.BLUE}Using augmentation method synonym insertion:{Style.RESET_ALL} {synonym_inserted_text}"
+)
+print(
+    f"{Fore.BLUE}Using augmentation method embedding replacement:{Style.RESET_ALL} {embedding_replaced_text}"
+)
+print(
+    f"{Fore.BLUE}Using augmentation method :{Style.RESET_ALL} {embedding_inserted_text}"
+)
 
 
 ## Now we use the word level augmenters to do some synonym and embedding replacements

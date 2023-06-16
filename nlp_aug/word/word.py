@@ -77,7 +77,7 @@ class WordReplIns:
             text += tok[buffer_start:].text
         return text
 
-    def replace_engine(self, data: str) -> str:
+    def replace_engine(self, data: str, replacement_prob: float = 0.5) -> str:
         """Using `replacement_rule()` and `synonym_selection()` a string is augmented
 
         Args:
@@ -94,7 +94,7 @@ class WordReplIns:
         new_doc = []
 
         for token in doc:
-            if self.replacement_rule(token):
+            if self.replacement_rule(token, replacement_prob=replacement_prob):
                 replacement = self.candidate_selection(token)
                 replacement = replacement.replace("_", " ")
                 new_doc.append(replacement)
@@ -123,7 +123,7 @@ class WordReplIns:
         insertion_list = []
 
         for token in doc:
-            if self.replacement_rule(token):
+            if self.replacement_rule(token, replacement_prob=replacement_prob):
                 replacement = self.candidate_selection(token)
                 replacement = replacement.replace("_", " ")
                 insertion_list.append(replacement)
@@ -199,3 +199,22 @@ class BaseEmbeddingReplIns(BaseReplIns):
 # )
 
 # print(cr_train["text"])
+
+augmenter = Word()
+
+
+Word2VecBuilder(imdb_dataset["text"]).build("demo_word2vec")
+
+model = Word2Vec.load("word2vec.model")
+
+
+def word_augment_huggingface_data(
+    data, augmented_feature: str, mode: str, augment_probability: float = 1
+):
+    data[augmented_feature] = augment_data(
+        data[augmented_feature],
+        augmenter,
+        mode,
+        augment_probability=augment_probability,
+    )
+    return data

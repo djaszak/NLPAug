@@ -11,46 +11,45 @@ from nlp_aug.trainer.training_utils import (
     tokenize_function,
 )
 
+
 TRAIN = "train"
 TEST = "test"
 
 
 def load_my_dataset(dataset: str):
     if dataset == constants.AG_NEWS:
-        # works
+        # works train samples -> 120000 
         raw_dataset = load_dataset("ag_news")
-    elif dataset == constants.TREC6:
-        # works
+    elif dataset == constants.TREC:
+        # works train samples -> 5452 
         raw_dataset = load_dataset("trec")
         raw_dataset = raw_dataset.rename_column("label-coarse", "label")
-    elif dataset == constants.SUBJ:
-        # works
-        raw_dataset = load_dataset("SetFit/subj")
     elif dataset == constants.ROTTEN:
-        # works
+        # works train samples -> 8530
         raw_dataset = load_dataset("rotten_tomatoes")
     elif dataset == constants.IMDB:
-        # works
         raw_dataset = load_dataset("imdb")
     elif dataset == constants.SST2:
-        raw_dataset = load_dataset("gpt3mix/sst2")
-        #  raw_dataset = raw_dataset.rename_column("sentence", "text")
+        raw_dataset = load_dataset("sst2")
     elif dataset == constants.COLA:
         raw_dataset = load_dataset("linxinyuan/cola")
-        # raw_dataset = raw_dataset.rename_column("sentence", "text")
+    elif dataset == constants.TWEET_IRONY:
+        raw_dataset = load_dataset("tweet_eval", "irony")
+    elif dataset == constants.TWEET_CLIMATE:
+        raw_dataset = load_dataset("tweet_eval", "stance_climate")
     else:
         print("dataset not known")
         exit(-1)
 
     raw_dataset = raw_dataset.map(
-        tokenize_function, batched=True, num_proc=multiprocessing.cpu_count()
+        tokenize_function, batched=True
     )
-
     split = raw_dataset[TRAIN].train_test_split(0.8, seed=42)
 
+    print('TESTING WITH ONLY 10 SAMPLES!!!!')
     return (
-        split[TRAIN],
-        split[TEST],
-        raw_dataset[TEST],
+        split[TRAIN].select(range(10)),
+        split[TEST].select(range(10)),
+        raw_dataset[TEST].select(range(10)),
         np.unique(raw_dataset["train"]["label"]).shape[0],
     )

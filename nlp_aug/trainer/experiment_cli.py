@@ -65,30 +65,30 @@ parser.add_argument(
     "--dataset",
     type=str,
     required=True,
-    choices=[
-        constants.AG_NEWS,
-        constants.TREC6,
-        constants.SUBJ,
-        constants.ROTTEN,
-        constants.IMDB,
-        constants.SST2,
-        constants.COLA,
-    ],
+    # choices=[
+    #     constants.AG_NEWS,
+    #     constants.TREC6,
+    #     constants.SUBJ,
+    #     constants.ROTTEN,
+    #     constants.IMDB,
+    #     constants.SST2,
+    #     constants.COLA,
+    # ],
     help="This is the dataset, currently 7 widely known ones are available.",
 )
 parser.add_argument(
     "--mode",
     type=str,
     default="",
-    choices=[
-        "complete_randomizer",
-        "keyboard_replacer",
-        "mid_randomizer",
-        "random_switcher",
-        "inserter",
-        "remover",
-        "misspeller",
-    ],
+    # choices=[
+    #     "complete_randomizer",
+    #     "keyboard_replacer",
+    #     "mid_randomizer",
+    #     "random_switcher",
+    #     "inserter",
+    #     "remover",
+    #     "misspeller",
+    # ],
     help="The augmentation mode that should be used for this experiment. If none is provided, nothing is augmented",
 )
 parser.add_argument(
@@ -110,7 +110,6 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-
 run_character_augmentation_experiment(
     dataset=args.dataset,
     mode=args.mode,
