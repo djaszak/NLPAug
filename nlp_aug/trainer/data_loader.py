@@ -46,10 +46,9 @@ def load_my_dataset(dataset: str):
     )
     split = raw_dataset[TRAIN].train_test_split(0.8, seed=42)
 
-    print('TESTING WITH ONLY 10 SAMPLES!!!!')
     return (
-        split[TRAIN].select(range(10)),
-        split[TEST].select(range(10)),
-        raw_dataset[TEST].select(range(10)),
+        split[TRAIN],
+        split[TEST],
+        raw_dataset[TEST],
         np.unique(raw_dataset["train"]["label"]).shape[0],
     )
