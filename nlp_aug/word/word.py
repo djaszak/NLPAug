@@ -231,8 +231,9 @@ def augment_data(data, mode, augment_probability):
     if mode == constants.SYNONYM_REPLACEMENT:
         augmented_text = BaseSynonymReplIns().replace_engine(data, replacement_prob=augment_probability)
     if mode == constants.EMBEDDING_INSERTER or mode == constants.EMBEDDING_REPLACEMENT:
-        Word2VecBuilder(data).build(f"{datetime.now()}_{mode}_word2vec")
-        model = Word2Vec.load("word2vec.model")
+        name = hash(data)
+        Word2VecBuilder(data).build(f"{name}_word2vec")
+        model = Word2Vec.load(f"{name}_word2vec.model")
         if mode == constants.EMBEDDING_INSERTER:
             augmented_text = BaseEmbeddingReplIns(word2vec=model).insert_engine(data, replacement_prob=augment_probability)
         if mode == constants.EMBEDDING_REPLACEMENT:
@@ -249,15 +250,3 @@ def word_augment_huggingface_data(
         augment_probability=augment_probability,
     )
     return data
-
-imdb_dataset = load_dataset("imdb", split="train").select(range(10))
-augmented_imdb = imdb_dataset.map(
-    word_augment_huggingface_data,
-    fn_kwargs={
-        "augmented_feature": "text",
-        "mode": constants.SYNONYM_REPLACEMENT,
-        "augment_probability": 0.5,
-    },
-)
-
-print(augmented_imdb['text'])
