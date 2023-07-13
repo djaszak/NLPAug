@@ -32,6 +32,11 @@ def run_character_augmentation_experiment(
     train_set, test_set, eval_set, num_labels = load_my_dataset(dataset)
     augmented_train = concat_set = None
     if mode:
+        model = None
+        if mode == constants.EMBEDDING_INSERTER or mode == constants.EMBEDDING_REPLACEMENT:
+            name = hash(train_set["text"])
+            Word2VecBuilder(data).build(f"{name}_word2vec")
+            model = Word2Vec.load(f"{name}_word2vec.model")
         augmented_train = train_set.map(
             word_augment_huggingface_data,
             num_proc=multiprocessing.cpu_count(),
@@ -39,6 +44,7 @@ def run_character_augmentation_experiment(
                 "augmented_feature": "text",
                 "mode": mode,
                 "augment_probability": augment_probability,
+                "word2vec_model": model
             },
         )
     if concat:

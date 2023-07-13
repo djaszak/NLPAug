@@ -1,4 +1,3 @@
-import datetime
 import random
 import spacy
 from bs4 import BeautifulSoup
@@ -212,7 +211,7 @@ class BaseEmbeddingReplIns(BaseReplIns):
 
 #### Here comes the real new code, all above is just demo
 
-def augment_data(data, mode, augment_probability):
+def augment_data(data, mode, augment_probability, word2vec_model = None):
     """Augment data on word level. 4 modes will be supported
 
     Args:
@@ -231,9 +230,6 @@ def augment_data(data, mode, augment_probability):
     if mode == constants.SYNONYM_REPLACEMENT:
         augmented_text = BaseSynonymReplIns().replace_engine(data, replacement_prob=augment_probability)
     if mode == constants.EMBEDDING_INSERTER or mode == constants.EMBEDDING_REPLACEMENT:
-        name = hash(data)
-        Word2VecBuilder(data).build(f"{name}_word2vec")
-        model = Word2Vec.load(f"{name}_word2vec.model")
         if mode == constants.EMBEDDING_INSERTER:
             augmented_text = BaseEmbeddingReplIns(word2vec=model).insert_engine(data, replacement_prob=augment_probability)
         if mode == constants.EMBEDDING_REPLACEMENT:
@@ -242,11 +238,12 @@ def augment_data(data, mode, augment_probability):
     return augmented_text
 
 def word_augment_huggingface_data(
-    data, augmented_feature: str, mode: str, augment_probability: float = 1
+    data, augmented_feature: str, mode: str, augment_probability: float = 1, word2vec_model = None
 ):
     data[augmented_feature] = augment_data(
         data[augmented_feature],
         mode,
         augment_probability=augment_probability,
+        word2vec_model
     )
     return data
