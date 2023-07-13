@@ -1,16 +1,15 @@
+import datetime
 import random
 import spacy
-
+from bs4 import BeautifulSoup
 from colorama import Fore, Style
-
 from datasets import load_dataset
-
 from gensim.models import Word2Vec
-
 from nltk.corpus import wordnet as wn
 from nltk.tokenize import TreebankWordDetokenizer
-
 from spacy.matcher import Matcher
+from nlp_aug import constants
+from nlp_aug.word.word2vec_builder import Word2VecBuilder
 
 
 class Word:
@@ -105,7 +104,7 @@ class WordReplIns:
         data = d.detokenize(new_doc)
         return data
 
-    def insert_engine(self, data: str) -> str:
+    def insert_engine(self, data: str, replacement_prob: float = 0.5) -> str:
         """Using `replacement_rule()` and `synonym_selection()` a string is augmented
 
         Args:
@@ -187,34 +186,78 @@ class BaseEmbeddingReplIns(BaseReplIns):
         return token.text
 
 
-# model = Word2Vec.load("word2vec.model")
-# replacer = BaseEmbeddingReplIns(word2vec=model)
-
-
+#### Here starts the new augmenter with using the stuff from the demo
 # imdb_dataset = load_dataset("imdb", split="train").select(range(1))
-# cr_train = imdb_dataset.map(
-#     replacer.insert_engine,
-#     num_proc=4,
-#     fn_kwargs={'augmented_feature': 'text'}
-# )
 
-# print(cr_train["text"])
+# imdb_text = imdb_dataset["text"][0]
+# soup = BeautifulSoup(imdb_text, "html.parser")
+# imdb_text = " ".join(soup.stripped_strings)
+# print(f"{Fore.BLUE}Basic data:{Style.RESET_ALL} {imdb_text}")
 
-augmenter = Word()
+# # Now we use the word level augmenters to do some synonym and embedding replacements
+# synonym_replaced_text = BaseSynonymReplIns().replace_engine(imdb_text)
+# synonym_inserted_text = BaseSynonymReplIns().insert_engine(imdb_text)
 
+# ## Build a Word2Vec Model to use WordEmbeddings
+# Word2VecBuilder(imdb_dataset["text"]).build("demo_word2vec")
 
-Word2VecBuilder(imdb_dataset["text"]).build("demo_word2vec")
+# model = Word2Vec.load("word2vec.model")
 
-model = Word2Vec.load("word2vec.model")
+# embedding_replaced_text = BaseEmbeddingReplIns(word2vec=model).replace_engine(imdb_text)
+# embedding_inserted_text = BaseEmbeddingReplIns(word2vec=model).insert_engine(imdb_text)
 
+# Word2VecBuilder(imdb_dataset["text"]).build("demo_word2vec")
+
+# model = Word2Vec.load("word2vec.model")
+
+#### Here comes the real new code, all above is just demo
+
+def augment_data(data, mode, augment_probability):
+    """Augment data on word level. 4 modes will be supported
+
+    Args:
+        data: Just some strings
+        mode: 4 modes are supported:
+            * synonym_replacement
+            * synonym_inserter
+            * embedding_replacement
+            * embedding_inserter
+        augment_probability: _description_
+    """
+    # data = data
+    augmented_text = ''
+    if mode == constants.SYNONYM_INSERTER:
+        augmented_text = BaseSynonymReplIns().insert_engine(data, replacement_prob=augment_probability)
+    if mode == constants.SYNONYM_REPLACEMENT:
+        augmented_text = BaseSynonymReplIns().replace_engine(data, replacement_prob=augment_probability)
+    if mode == constants.EMBEDDING_INSERTER or mode == constants.EMBEDDING_REPLACEMENT:
+        Word2VecBuilder(data).build(f"{datetime.now()}_{mode}_word2vec")
+        model = Word2Vec.load("word2vec.model")
+        if mode == constants.EMBEDDING_INSERTER:
+            augmented_text = BaseEmbeddingReplIns(word2vec=model).insert_engine(data, replacement_prob=augment_probability)
+        if mode == constants.EMBEDDING_REPLACEMENT:
+            augmented_text = BaseEmbeddingReplIns(word2vec=model).replace_engine(data, replacement_prob=augment_probability)
+
+    return augmented_text
 
 def word_augment_huggingface_data(
     data, augmented_feature: str, mode: str, augment_probability: float = 1
 ):
     data[augmented_feature] = augment_data(
         data[augmented_feature],
-        augmenter,
         mode,
         augment_probability=augment_probability,
     )
     return data
+
+imdb_dataset = load_dataset("imdb", split="train").select(range(10))
+augmented_imdb = imdb_dataset.map(
+    word_augment_huggingface_data,
+    fn_kwargs={
+        "augmented_feature": "text",
+        "mode": constants.SYNONYM_REPLACEMENT,
+        "augment_probability": 0.5,
+    },
+)
+
+print(augmented_imdb['text'])

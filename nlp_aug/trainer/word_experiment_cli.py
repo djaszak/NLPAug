@@ -3,7 +3,7 @@ import multiprocessing
 from datasets import concatenate_datasets
 
 from nlp_aug import constants
-from nlp_aug.character.character import augment_huggingface_data
+from nlp_aug.word.word import word_augment_huggingface_data
 from nlp_aug.trainer.training_utils import tensorflow_training_wrapper
 from nlp_aug.trainer.data_loader import load_my_dataset
 
@@ -11,19 +11,6 @@ import argparse
 import datetime
 import sys
 import time
-
-
-def run_word_augmentation_experiment(
-    dataset: str,
-    mode: str = "",
-    augment_probability: float = 0.75,
-    epochs: int = 5,
-    concat: bool = False,
-):
-    Word2VecBuilder(imdb_dataset["text"]).build("demo_word2vec")
-    model = Word2Vec.load("word2vec.model")
-
-    embedding_replaced_text = BaseEmbeddingReplIns(word2vec=model).replace_engine(imdb_text)
 
 
 def run_character_augmentation_experiment(
@@ -46,7 +33,7 @@ def run_character_augmentation_experiment(
     augmented_train = concat_set = None
     if mode:
         augmented_train = train_set.map(
-            augment_huggingface_data,
+            word_augment_huggingface_data,
             num_proc=multiprocessing.cpu_count(),
             fn_kwargs={
                 "augmented_feature": "text",
@@ -123,7 +110,6 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-
 run_character_augmentation_experiment(
     dataset=args.dataset,
     mode=args.mode,

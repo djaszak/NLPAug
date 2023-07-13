@@ -8,3 +8,9 @@ COLA = "cola"
 TWEET_IRONY = "tweet_irony"
 TWEET_CLIMATE = "tweet_climate"
 ROTTEN = "rotten"
+
+# Word level modes
+SYNONYM_REPLACEMENT = "synonym_replacement"
+SYNONYM_INSERTER = "synonym_inserter"
+EMBEDDING_REPLACEMENT = "embedding_replacement"
+EMBEDDING_INSERTER = "embedding_inserter"
