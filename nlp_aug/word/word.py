@@ -244,6 +244,6 @@ def word_augment_huggingface_data(
         data[augmented_feature],
         mode,
         augment_probability=augment_probability,
-        word2vec_model
+        word2vec_model=word2vec_model
     )
     return data
