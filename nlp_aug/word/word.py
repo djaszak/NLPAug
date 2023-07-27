@@ -184,31 +184,6 @@ class BaseEmbeddingReplIns(BaseReplIns):
                 return token.text
         return token.text
 
-
-#### Here starts the new augmenter with using the stuff from the demo
-# imdb_dataset = load_dataset("imdb", split="train").select(range(1))
-
-# imdb_text = imdb_dataset["text"][0]
-# soup = BeautifulSoup(imdb_text, "html.parser")
-# imdb_text = " ".join(soup.stripped_strings)
-# print(f"{Fore.BLUE}Basic data:{Style.RESET_ALL} {imdb_text}")
-
-# # Now we use the word level augmenters to do some synonym and embedding replacements
-# synonym_replaced_text = BaseSynonymReplIns().replace_engine(imdb_text)
-# synonym_inserted_text = BaseSynonymReplIns().insert_engine(imdb_text)
-
-# ## Build a Word2Vec Model to use WordEmbeddings
-# Word2VecBuilder(imdb_dataset["text"]).build("demo_word2vec")
-
-# model = Word2Vec.load("word2vec.model")
-
-# embedding_replaced_text = BaseEmbeddingReplIns(word2vec=model).replace_engine(imdb_text)
-# embedding_inserted_text = BaseEmbeddingReplIns(word2vec=model).insert_engine(imdb_text)
-
-# Word2VecBuilder(imdb_dataset["text"]).build("demo_word2vec")
-
-# model = Word2Vec.load("word2vec.model")
-
 #### Here comes the real new code, all above is just demo
 
 def augment_data(data, mode, augment_probability, word2vec_model = None):
