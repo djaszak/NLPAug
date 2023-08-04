@@ -40,9 +40,8 @@ class WordReplIns:
     thesaurus = None
 
     def __init__(self, nlp=None, thesaurus=None):
-        self.thesaurus = thesaurus
-        if not nlp:
-            self.nlp = spacy.load("en_core_web_lg")
+        # if not nlp:
+        self.nlp = spacy.load("en_core_web_lg")
         self.matcher = Matcher(self.nlp.vocab)
 
     def replacement_rule(self, token: spacy.tokens.token.Token) -> bool:
@@ -172,7 +171,7 @@ class BaseSynonymReplIns(BaseReplIns):
 
 class BaseEmbeddingReplIns(BaseReplIns):
     def __init__(self, thesaurus=None, word2vec: Word2Vec = None):
-        super().__init__(thesaurus)
+        super().__init__(thesaurus, word2vec)
         self.word2vec = word2vec
 
     def candidate_selection(self, token: spacy.tokens.token.Token) -> str:
@@ -206,9 +205,9 @@ def augment_data(data, mode, augment_probability, word2vec_model = None):
         augmented_text = BaseSynonymReplIns().replace_engine(data, replacement_prob=augment_probability)
     if mode == constants.EMBEDDING_INSERTER or mode == constants.EMBEDDING_REPLACEMENT:
         if mode == constants.EMBEDDING_INSERTER:
-            augmented_text = BaseEmbeddingReplIns(word2vec=model).insert_engine(data, replacement_prob=augment_probability)
+            augmented_text = BaseEmbeddingReplIns(word2vec=word2vec_model).insert_engine(data, replacement_prob=augment_probability)
         if mode == constants.EMBEDDING_REPLACEMENT:
-            augmented_text = BaseEmbeddingReplIns(word2vec=model).replace_engine(data, replacement_prob=augment_probability)
+            augmented_text = BaseEmbeddingReplIns(word2vec=word2vec_model).replace_engine(data, replacement_prob=augment_probability)
 
     return augmented_text
 

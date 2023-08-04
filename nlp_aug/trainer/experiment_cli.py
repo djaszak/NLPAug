@@ -42,7 +42,7 @@ def run_character_augmentation_experiment(
             },
         )
     if concat:
-        train_set = concatenate_datasets([train_set, augmented_train])
+        augmented_train = concatenate_datasets([train_set, augmented_train])
 
     train_set = augmented_train if augmented_train else train_set
 

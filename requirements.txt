@@ -48,7 +48,7 @@ multidict==6.0.2
 multiprocess==0.70.13
 murmurhash==1.0.8
 mypy-extensions==0.4.3
--e git+https://github.com/djaszak/NLPAug.git@59f4a09f14a6ffac3299b6ad30fd2e0e8e268b30#egg=nlp_aug
+-e git+https://github.com/djaszak/NLPAug.git@0c0016a22188863d811cbdee74add29c298a1b04#egg=nlp_aug
 nltk==3.7
 numpy==1.23.0
 oauthlib==3.2.0
