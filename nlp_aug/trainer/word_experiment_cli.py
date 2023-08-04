@@ -2,10 +2,13 @@ import multiprocessing
 
 from datasets import concatenate_datasets
 
+from gensim.models import Word2Vec
+
 from nlp_aug import constants
 from nlp_aug.word.word import word_augment_huggingface_data
 from nlp_aug.trainer.training_utils import tensorflow_training_wrapper
 from nlp_aug.trainer.data_loader import load_my_dataset
+from nlp_aug.word.word2vec_builder import Word2VecBuilder
 
 import argparse
 import datetime
@@ -34,8 +37,8 @@ def run_character_augmentation_experiment(
     if mode:
         model = None
         if mode == constants.EMBEDDING_INSERTER or mode == constants.EMBEDDING_REPLACEMENT:
-            name = hash(train_set["text"])
-            Word2VecBuilder(data).build(f"{name}_word2vec")
+            name = hash(datetime.datetime.now())
+            Word2VecBuilder(train_set["text"]).build(f"{name}_word2vec")
             model = Word2Vec.load(f"{name}_word2vec.model")
         augmented_train = train_set.map(
             word_augment_huggingface_data,
@@ -48,7 +51,7 @@ def run_character_augmentation_experiment(
             },
         )
     if concat:
-        train_set = concatenate_datasets([train_set, augmented_train])
+        augmented_train = concatenate_datasets([train_set, augmented_train])
 
     train_set = augmented_train if augmented_train else train_set
 
@@ -61,7 +64,7 @@ def run_character_augmentation_experiment(
         epochs=epochs,
     )
     time_2 = time.time()
-    sys.stdout.write(f"Augmentation took about {round((time_2-time_1)/60)} minutes\n")
+    sys.stdout.write(f"Training took about {round((time_2-time_1)/60)} minutes\n")
 
 
 parser = argparse.ArgumentParser(
