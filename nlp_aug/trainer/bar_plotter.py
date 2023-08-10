@@ -79,7 +79,6 @@ def bar_plot_dataset_overall_augmentation(dataset: str, acc_dict: dict) -> None:
     colors = []
 
     base_value = 0
-    suffix = "_0.5_True_history.json"
 
     # Format data out of dict into plottable format
     for key, value in acc_dict.items():
@@ -101,43 +100,9 @@ def bar_plot_dataset_overall_augmentation(dataset: str, acc_dict: dict) -> None:
             diff_list.append(base_value - value)
             colors.append("g" if value > base_value else "red")
 
-    # Format lists into dataframe
-    data = {"Augmentation method": label_list, "Accuracy": value_list}
-    df = pd.DataFrame(data, columns=["Accuracy", "Augmentation method"])
-
     # Plot
-    # f, ax = plt.subplots(figsize=(6, 15))
     sns.set_theme(style="whitegrid")
-    # plots = sns.barplot(x="Augmentation method", y="Accuracy", data=df)
-    # sns.despine(left=True, bottom=True)
-    # Annotation bars
-    # for bar in plots.patches:
-    #     accuracy_diff = (
-    #         f"({round(plots.patches[0].get_height() - bar.get_height(), 4) * -1})"
-    #     )
-    #     if accuracy_diff == "(-0.0)":
-    #         accuracy_diff = ""
-    #     plots.annotate(
-    #         f'{format(bar.get_height(), ".4f")} \n {accuracy_diff}',
-    #         (bar.get_x() + bar.get_width() / 2, bar.get_height()),
-    #         ha="center",
-    #         va="center",
-    #         size=5.5,
-    #         xytext=(0, 8),
-    #         textcoords="offset points",
-    #     )
     # Actual plot + misc stuff
-
-    # ax.legend(ncol=2, loc="lower right", frameon=True)
-    # ax.set(xlim=(0, 24), ylabel="", xlabel="Automobile collisions per billion miles")
-    # ax.barh(value_list, performance, xerr=error, align='center')
-    # create dataset
-    # height = [3, 12, 5, 18, 45]
-    # bars = ('A', 'B', 'C', 'D', 'E')
-    # y_pos = np.arange(len(bars))
-    
-    # # Create horizontal bars
-    # plt.barh(y_pos, height)
 
     plt.xlabel("Accuracy", fontsize="8")
     plt.ylabel("Augmentation method", fontsize="8")
@@ -157,9 +122,8 @@ def bar_plot_dataset_overall_augmentation(dataset: str, acc_dict: dict) -> None:
     )
     plt.close()
 
-
-bar_plot_dataset_overall_augmentation("trec", trec_accs)
-bar_plot_dataset_overall_augmentation("imdb", imdb_accs)
-bar_plot_dataset_overall_augmentation("rotten", rotten_accs)
-bar_plot_dataset_overall_augmentation("tweet_climate", tweet_climate_accs)
-bar_plot_dataset_overall_augmentation("tweet_irony", tweet_irony_accs)
+bar_plot_dataset_overall_augmentation("trec (5452 samples)", trec_accs)
+bar_plot_dataset_overall_augmentation("imdb (25000 samples)", imdb_accs)
+bar_plot_dataset_overall_augmentation("rotten tomatoes (8530 samples)", rotten_accs)
+bar_plot_dataset_overall_augmentation("tweet climate (355 samples)", tweet_climate_accs)
+bar_plot_dataset_overall_augmentation("tweet irony (2862 samples)", tweet_irony_accs)
