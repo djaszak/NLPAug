@@ -54,7 +54,8 @@ def run_character_augmentation_experiment(
         augmented_train = concatenate_datasets([train_set, augmented_train])
 
     train_set = augmented_train if augmented_train else train_set
-
+    time_3 = time.time()
+    sys.stdout.write(f"Augmentation took about {round((time_3-time_1)/60)} minutes\n")
     tensorflow_training_wrapper(
         train_dataset=train_set,
         eval_dataset=eval_set,
@@ -118,6 +119,7 @@ parser.add_argument(
     help="Should the augmented mode be tested or should it be concatenated with the original dataset",
 )
 
+print('TROLO')
 args = parser.parse_args()
 run_character_augmentation_experiment(
     dataset=args.dataset,
