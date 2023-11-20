@@ -1,5 +1,6 @@
 import random
 import spacy
+import sys
 from bs4 import BeautifulSoup
 from colorama import Fore, Style
 from datasets import load_dataset
@@ -85,11 +86,13 @@ class WordReplIns:
         Returns:
             str: The augmented string.
         """
+        sys.stdout.write(f"Starting replacement of embedding based augmentation")
         data_feature = data
         doc = self.nlp(data_feature)
 
         new_doc = []
 
+        sys.stdout.write(f"Starting replacement of embedding based augmentation")
         for token in doc:
             if self.replacement_rule(token, replacement_prob=replacement_prob):
                 replacement = self.candidate_selection(token)
@@ -113,6 +116,7 @@ class WordReplIns:
         Returns:
             str: The augmented string.
         """
+        sys.stdout.write(f"Starting insertion of embedding based augmentation")
         data_feature = data
         doc = self.nlp(data_feature)
 

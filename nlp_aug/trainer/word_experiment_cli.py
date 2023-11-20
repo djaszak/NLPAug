@@ -37,6 +37,7 @@ def run_character_augmentation_experiment(
     if mode:
         model = None
         if mode == constants.EMBEDDING_INSERTER or mode == constants.EMBEDDING_REPLACEMENT:
+            sys.stdout.write(f"Starting embedding model creation")
             name = hash(datetime.datetime.now())
             Word2VecBuilder(train_set["text"]).build(f"{name}_word2vec")
             model = Word2Vec.load(f"{name}_word2vec.model")
