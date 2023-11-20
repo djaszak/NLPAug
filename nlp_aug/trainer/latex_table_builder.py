@@ -1,6 +1,7 @@
 import json
 import os
 import math
+import pprint 
 
 from pathlib import Path
 from nlp_aug import constants
@@ -82,15 +83,69 @@ accs = [trec_accs, tweet_irony_accs, tweet_climate_accs, rotten_accs, imdb_accs]
 
 formatted_accs = [transform_dict(acc) for acc in accs]
 
-for acc in formatted_accs:
-    print(
-        tabulate(
-            acc,
-            headers=[
-                "Augmentation Name",
-                "Evaluation Accuracy",
-                "Accuracy difference compared to base",
-            ],
-            tablefmt="latex",
-        )
-    )
+scoring_points = {}
+
+cleaned_accs = []
+
+# print(transform_dict(trec_accs))
+
+for acc in transform_dict(trec_accs):
+    if not 'size' in acc or 'num_labels' in acc:
+        acc[0] = acc[0].replace('trec ', '')
+        cleaned_accs.append(acc)
+for acc in transform_dict(tweet_irony_accs):
+    if not 'size' in acc or 'num_labels' in acc:
+        acc[0] = acc[0].replace('tweet irony ', '')
+        cleaned_accs.append(acc)
+for acc in transform_dict(tweet_climate_accs):
+    if not 'size' in acc or 'num_labels' in acc:
+        acc[0] = acc[0].replace('tweet climate ', '')
+        cleaned_accs.append(acc)
+for acc in transform_dict(imdb_accs):
+    if not 'size' in acc or 'num_labels' in acc:
+        acc[0] = acc[0].replace('imdb ', '')
+        cleaned_accs.append(acc)
+for acc in transform_dict(rotten_accs):
+    if not 'size' in acc or 'num_labels' in acc:
+        acc[0] = acc[0].replace('rotten ', '')
+        cleaned_accs.append(acc)
+
+
+print(cleaned_accs)
+
+for cleaned_acc in cleaned_accs:
+    if cleaned_acc[0] not in scoring_points.keys():
+        scoring_points[cleaned_acc[0]] = 0
+    if cleaned_acc[2] > 0:
+        scoring_points[cleaned_acc[0]] += 1
+    if cleaned_acc[2] < 0:
+        scoring_points[cleaned_acc[0]] -= 1
+
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(scoring_points)
+
+# print(
+#     tabulate(
+#         scoring_points,
+#         headers=[
+#                 "Augmentierungsmethode",
+#                 "Punkte",
+#         ],
+#         tablefmt='latex'
+#     )
+# )
+
+# for acc in formatted_accs:
+#     print(
+#         tabulate(
+#             acc,
+#             headers=[
+#                 "Augmentation Name",
+#                 "Evaluation Accuracy",
+#                 "Accuracy difference compared to base",
+#             ],
+#             tablefmt="latex",
+#         )
+#     )
+
+

@@ -24,7 +24,7 @@ class Word2VecBuilder:
             sentences=data,
             vector_size=50,
             window=10,
-            epochs=20,
+            epochs=5,
         )
 
         model.save(f"{name}.model")
